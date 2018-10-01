@@ -1,0 +1,6 @@
+[package]
+name = "rs_wad"
+version = "0.1.0"
+authors = ["bjt0"]
+
+[dependencies]
