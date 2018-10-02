@@ -1,7 +1,11 @@
+pub mod wad;
+
 #[cfg(test)]
 mod tests {
+    use wad::*;
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn read_header() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
     }
 }
