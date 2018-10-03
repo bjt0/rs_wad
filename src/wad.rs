@@ -3,12 +3,16 @@ use std::path::Path;
 use std::error::Error;
 use std::io::{Read, Seek, SeekFrom};
 
+use utils;
+
 pub enum WadType {
     IWAD, PWAD
 }
 
 pub struct Header {
-    wad_type: WadType
+    wad_type: WadType,
+    num_lumps:  usize,
+    dir_offset: usize
 }
 
 impl Header { 
@@ -31,15 +35,28 @@ impl Header {
             Err(not_ascii) => panic!("Could not read WAD type from header. Is this a WAD file? ({})", not_ascii.description())
         };
 
-
-
-        let wad_type : WadType = match wad_type_str.as_str() {
+        let wad_type: WadType = match wad_type_str.as_str() {
             "IWAD" => WadType::IWAD, 
             "PWAD" => WadType::PWAD,
             _      => panic!("Could not convert the WAD type ASCII string into our internal enum. Are you sure this is a WAD file?")
         };
 
-        Header { wad_type }
+        let num_lumps: usize = utils::u8ref_to_u32(&header_raw[4..8]) as usize;
+        let dir_offset: usize = utils::u8ref_to_u32(&header_raw[8..12]) as usize;
+
+        Header { wad_type, num_lumps, dir_offset }
+    }
+
+    pub fn wad_type(&self) -> &WadType {
+        &self.wad_type
+    }
+
+    pub fn num_lumps(&self) -> usize {
+        self.num_lumps
+    }
+
+    pub fn dir_offset(&self) -> usize {
+        self.dir_offset
     }
 }
 
@@ -53,6 +70,10 @@ pub struct Wad {
 }
 
 impl Wad {
+    pub fn get_header(&self) -> &Header {
+        &self.header
+    }
+
     pub fn from_path(path: &str) -> Wad {
         let path = Path::new(path);
 
