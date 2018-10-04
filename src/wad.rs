@@ -38,7 +38,7 @@ impl Header {
         let wad_type: WadType = match wad_type_str.as_str() {
             "IWAD" => WadType::IWAD, 
             "PWAD" => WadType::PWAD,
-            _      => panic!("Could not convert the WAD type ASCII string into our internal enum. Are you sure this is a WAD file?")
+            _      => panic!("Could not convert the first 4 bytes of the provided file into a WAD type. Are you sure this is a WAD file?")
         };
 
         let num_lumps: usize = utils::u8ref_to_u32(&header_raw[4..8]) as usize;
@@ -62,6 +62,17 @@ impl Header {
 
 pub struct Directory {
 
+}
+
+impl Directory {
+    pub fn from_file(mut file: &File, dir_offset: usize) -> Directory {
+        match file.seek(SeekFrom::Start(dir_offset as u64)) {
+            Ok(_)    => { }
+            Err(why) => panic!("Unable to seek to the start of the file. ({})", why.description()) 
+        };
+
+        Directory { }
+    }
 }
 
 pub struct Wad {
@@ -89,9 +100,9 @@ impl Wad {
         Wad::from_file(&wad_file)
     }
 
-    pub fn from_file(mut file: &File) -> Wad {
+    pub fn from_file(file: &File) -> Wad {
         let header    = Header::from_file(file);
-        let directory = Directory { };
+        let directory = Directory::from_file(file, header.dir_offset());
 
         Wad { header, directory }
     }
