@@ -17,7 +17,7 @@ mod tests {
 
         assert_eq!(pwad_check, true);
 
-        // GOETIA1.wad has 189 lumps in it
-        assert_eq!(w.get_header().num_lumps(), 189);
+        // GOETIA1.wad has 152 lumps in it
+        assert_eq!(w.get_header().num_lumps(), 152);
     }
 }

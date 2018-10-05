@@ -41,7 +41,9 @@ impl Header {
             _      => panic!("Could not convert the first 4 bytes of the provided file into a WAD type. Are you sure this is a WAD file?")
         };
 
+        // total entries in the directory
         let num_lumps: usize = utils::u8ref_to_u32(&header_raw[4..8]) as usize;
+        // where to seek to for the start of the directory 
         let dir_offset: usize = utils::u8ref_to_u32(&header_raw[8..12]) as usize;
 
         Header { wad_type, num_lumps, dir_offset }
@@ -65,11 +67,31 @@ pub struct Directory {
 }
 
 impl Directory {
-    pub fn from_file(mut file: &File, dir_offset: usize) -> Directory {
-        match file.seek(SeekFrom::Start(dir_offset as u64)) {
+    pub fn from_file(mut file: &File, header: &Header) -> Directory {
+        match file.seek(SeekFrom::Start(header.dir_offset() as u64)) {
             Ok(_)    => { }
             Err(why) => panic!("Unable to seek to the start of the file. ({})", why.description()) 
         };
+
+        // each directory entry is 16 bytes
+        for index in 0..header.num_lumps() {
+            let mut entry_raw: [u8; 16] = [0; 16];
+
+            match file.read(&mut entry_raw) {
+                Ok(_) => { },
+                Err(why) => panic!("Error when reading lump size for lump {}: {}", index, why.description())
+            }
+
+            // pointer to the start of the lump's data
+            let dir_offset: usize = utils::u8ref_to_u32(&entry_raw[0..4]) as usize;
+            // the size of the lump in bytes
+            let lump_size: usize = utils::u8ref_to_u32(&entry_raw[4..8]) as usize;
+
+            let lump_name_str: String = match String::from_utf8(entry_raw[8..16].to_vec()) {
+                Ok(wtype)      => wtype,
+                Err(not_ascii) => panic!("Could not read entry name for {}. Reason: {}", index, not_ascii.description())
+            };
+        }
 
         Directory { }
     }
@@ -102,7 +124,7 @@ impl Wad {
 
     pub fn from_file(file: &File) -> Wad {
         let header    = Header::from_file(file);
-        let directory = Directory::from_file(file, header.dir_offset());
+        let directory = Directory::from_file(file, &header);
 
         Wad { header, directory }
     }
