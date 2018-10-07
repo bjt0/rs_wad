@@ -20,4 +20,12 @@ mod tests {
         // GOETIA1.wad has 152 lumps in it
         assert_eq!(w.get_header().num_lumps(), 152);
     }
+
+    #[test]
+    fn read_directory() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
+        
+        // GOETIA1.wad has 152 lumps in it
+        assert_eq!(w.get_directory().num_lumps(), 152);
+    }
 }

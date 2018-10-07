@@ -1,3 +1,4 @@
+use std::fmt;
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;
@@ -63,16 +64,29 @@ impl Header {
 }
 
 pub struct Directory {
-
+    lumps: Vec<Lump>
 }
 
 impl Directory {
+    pub fn get_at_index(&self, index: usize) -> &Lump {
+        if index >= self.lumps.len() {
+            panic!("Tried to index a lump that was outside of the WAD's lump count.");
+        }
+
+        &self.lumps[index]
+    }
+
+    pub fn num_lumps(&self) -> usize {
+        self.lumps.len()
+    }
+
     pub fn from_file(mut file: &File, header: &Header) -> Directory {
         match file.seek(SeekFrom::Start(header.dir_offset() as u64)) {
             Ok(_)    => { }
             Err(why) => panic!("Unable to seek to the start of the file. ({})", why.description()) 
         };
 
+        let mut results: Vec<Lump> = Vec::new();
         // each directory entry is 16 bytes
         for index in 0..header.num_lumps() {
             let mut entry_raw: [u8; 16] = [0; 16];
@@ -91,9 +105,25 @@ impl Directory {
                 Ok(wtype)      => wtype,
                 Err(not_ascii) => panic!("Could not read entry name for {}. Reason: {}", index, not_ascii.description())
             };
+
+            let result: Lump = Lump { name: lump_name_str, index, size: lump_size, location: dir_offset };
+            results.push(result);
         }
 
-        Directory { }
+        Directory { lumps: results }
+    }
+}
+
+pub struct Lump {
+    name:     String, 
+    index:    usize, 
+    size:     usize,
+    location: usize
+}
+
+impl fmt::Display for Lump {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}. index: {}, size: {}, location: {}", self.name, self.index, self.size, self.location)
     }
 }
 
@@ -105,6 +135,10 @@ pub struct Wad {
 impl Wad {
     pub fn get_header(&self) -> &Header {
         &self.header
+    }
+
+    pub fn get_directory(&self) -> &Directory {
+        &self.directory
     }
 
     pub fn from_path(path: &str) -> Wad {
