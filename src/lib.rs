@@ -1,4 +1,5 @@
 pub mod wad;
+pub mod dir;
 pub mod utils;
 
 #[cfg(test)]
