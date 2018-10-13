@@ -39,7 +39,7 @@ impl Header {
         let wad_type: WadType = match wad_type_str.as_str() {
             "IWAD" => WadType::IWAD, 
             "PWAD" => WadType::PWAD,
-            "WAD2" => WadType::WAD2,
+            "WAD2" => WadType::WAD2, // for Quake 
             _      => panic!("Could not convert the first 4 bytes of the provided file into a WAD type. Are you sure this is a WAD file?")
         };
 
@@ -65,7 +65,7 @@ impl Header {
 }
 
 pub struct Wad {
-    header: Header,
+    header:    Header,
     directory: Directory
 }
 
