@@ -7,7 +7,8 @@ use utils;
 use wad::Header;
 
 pub struct Directory {
-    lumps: Vec<Lump>
+    lumps: Vec<Lump>,
+    cache: Vec<LumpData>
 }
 
 impl Directory {
@@ -19,6 +20,14 @@ impl Directory {
         &self.lumps[index]
     }
 
+    pub fn get_data_at_index(&self, index: usize) -> &Vec<u8> {
+        if index >= self.lumps.len() {
+            panic!("Tried to index a lump that was outside of the WAD's lump count.");
+        }
+
+        &self.cache[index].data
+    }
+
     pub fn num_lumps(&self) -> usize {
         self.lumps.len()
     }
@@ -26,11 +35,10 @@ impl Directory {
     pub fn from_file(mut file: &File, header: &Header) -> Directory {
         match file.seek(SeekFrom::Start(header.dir_offset() as u64)) {
             Ok(_)    => { }
-            Err(why) => panic!("Unable to seek to the start of the file. ({})", why.description()) 
+            Err(why) => panic!("Unable to seek to the start of the directory. ({})", why.description()) 
         };
 
-        struct Entry(String, u32, usize, usize); // name, index, size, offset
-        let mut entries: Vec<Entry> = Vec::new();
+        let mut results: Vec<Lump> = Vec::new();
 
         for index in 0..header.num_lumps() {
             let mut entry_raw: [u8; 16] = [0; 16];
@@ -45,44 +53,39 @@ impl Directory {
             // the size of the lump in bytes
             let lump_size: usize = utils::u8ref_to_u32(&entry_raw[4..8]) as usize;
 
+            // this is technically just ASCII, so I should probably change it but it works for now
             let lump_name_str: String = match String::from_utf8(entry_raw[8..16].to_vec()) {
                 Ok(wtype)      => wtype,
                 Err(not_ascii) => panic!("Could not read entry name for {}: {}", index, not_ascii.description())
             };
 
-            let e = Entry { 0: lump_name_str, 1: index as u32, 2: lump_size, 3: dir_offset };
-            entries.push(e);
+            // remove trailing unicode NULLs from the conversion
+            let trimmed_lump_name_str: String = lump_name_str.trim_right_matches(char::from(0)).to_string();
+
+            let lump = Lump { name: trimmed_lump_name_str, index, size: lump_size, location: dir_offset };
+            results.push(lump);
         }
 
-        let mut results: Vec<Lump> = Vec::new();
+        // borrow results to load data
+        let mut cache: Vec<LumpData> = Vec::new();
 
-        for entry in entries {
-            if entry.2 > 0 {
-                // seek to raw data location
-                match file.seek(SeekFrom::Start(entry.3 as u64)) {
-                    Ok(_)    => { }
-                    Err(why) => panic!("Unable to seek to the data for lump {}. Reason: {}", entry.0, why.description()) 
-                };
+        for lump in &results {
+            let position = match file.seek(SeekFrom::Start(lump.location as u64)) {
+                Ok(pos)  => pos,
+                Err(why) => panic!("Unable to seek to the location of lump {}. Reason: {}", lump.name, why.description()) 
+            };
 
-                let mut raw_data: Vec<u8> = Vec::with_capacity(entry.2);
+            let mut raw_data = vec![0; lump.size];
+            let lump_read = match file.read_exact(&mut raw_data) {
+                Ok(_) => { },
+                Err(why) => panic!("Error when reading data for lump {}. Reason: {}", lump.name, why.description())
+            };
 
-                match file.read_exact(&mut raw_data) {
-                    Ok(_) => { },
-                    Err(why) => panic!("Error when reading data for lump {}. Reason: {}", entry.0, why.description())
-                }
-
-                let result = Lump { name: entry.0.clone(), index: entry.1, size: entry.2, location: entry.3, data: raw_data };
-                results.push(result);
-            } else {
-                // this is a marker
-                let data: Vec<u8> = Vec::new();
-                let result = Lump { name: entry.0.clone(), index: entry.1, size: entry.2, location: entry.3, data };
-
-                results.push(result);
-            }
+            let lump_data = LumpData { index: lump.index, data: raw_data };
+            cache.push(lump_data);
         }
 
-        Directory { lumps: results }
+        Directory { lumps: results, cache }
     }
 }
 
@@ -90,14 +93,29 @@ impl Directory {
 // WAD2 lumps have a different format including compression type, etc
 pub struct Lump {
     name:     String, 
-    index:    u32, 
+    index:    usize, 
     size:     usize,
     location: usize,
-    data:     Vec<u8>
+}
+
+impl Lump {
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
+
+    pub fn get_size(&self) -> usize {
+        self.size
+    }
 }
 
 impl fmt::Display for Lump {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}: index: {}, size: {}, location: {}", self.name, self.index, self.size, self.location)
     }
+}
+
+// basically just a wrapper for a u8 vec so that it doesn't look ugly when creating the cache
+pub struct LumpData {
+    index: usize,
+    data:  Vec<u8> 
 }
