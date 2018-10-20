@@ -4,7 +4,7 @@ use std::error::Error;
 use std::io::{Read, Seek, SeekFrom};
 
 use utils;
-use dir::{Directory};
+use dir::{Directory, Lump};
 
 pub enum WadType {
     IWAD, PWAD, WAD2
@@ -74,8 +74,16 @@ impl Wad {
         &self.header
     }
 
-    pub fn get_directory(&self) -> &Directory {
-        &self.directory
+    pub fn num_lumps(&self) -> usize {
+        self.directory.num_lumps()
+    }
+
+    pub fn get_at_index(&self, index: usize) -> &Lump {
+        self.directory.get_at_index(index)
+    }
+
+    pub fn get_data_at_index(&self, index: usize) -> &Vec<u8> {
+        self.directory.get_data_at_index(index)
     }
 
     pub fn from_path(path: &str) -> Wad {
