@@ -23,18 +23,23 @@ mod tests {
     }
 
     #[test]
-    fn read_directory() {
+    fn read_lump() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
         
         // GOETIA1.wad has 152 lumps in it
         assert_eq!(w.num_lumps(), 152);
 
         // the first lump in GOETIA1 is WIMAP0 (an intermission screen background)
-        let wimap = w.get_at_index(0);
+        let wimap = w.get_at_index(0).unwrap();
         assert_eq!(wimap.get_name(), "WIMAP0");
 
         // verify length of data
-        let wimap_data = w.get_data_at_index(0);
+        let wimap_data = w.get_data_at_index(0).unwrap();
         assert_eq!(wimap.get_size(), wimap_data.len());
+    }
+
+    #[test]
+    fn read_lump_by_name() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
     }
 }

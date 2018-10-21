@@ -78,11 +78,11 @@ impl Wad {
         self.directory.num_lumps()
     }
 
-    pub fn get_at_index(&self, index: usize) -> &Lump {
+    pub fn get_at_index(&self, index: usize) -> Option<&Lump> {
         self.directory.get_at_index(index)
     }
 
-    pub fn get_data_at_index(&self, index: usize) -> &Vec<u8> {
+    pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
         self.directory.get_data_at_index(index)
     }
 

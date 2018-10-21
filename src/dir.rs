@@ -12,20 +12,20 @@ pub struct Directory {
 }
 
 impl Directory {
-    pub fn get_at_index(&self, index: usize) -> &Lump {
+    pub fn get_at_index(&self, index: usize) -> Option<&Lump> {
         if index >= self.lumps.len() {
-            panic!("Tried to index a lump that was outside of the WAD's lump count.");
+            return None
         }
 
-        &self.lumps[index]
+        Some(&self.lumps[index])
     }
 
-    pub fn get_data_at_index(&self, index: usize) -> &Vec<u8> {
+    pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
         if index >= self.lumps.len() {
-            panic!("Tried to index a lump that was outside of the WAD's lump count.");
+            return None
         }
 
-        &self.cache[index].data
+        Some(&self.cache[index].data)
     }
 
     pub fn num_lumps(&self) -> usize {
