@@ -41,5 +41,19 @@ mod tests {
     #[test]
     fn read_lump_by_name() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
+
+        // this one should fail because GOETIA1.wad is a Doom 1 WAD 
+        let op = w.get_by_name(String::from("MAP01"));
+        assert_eq!(op.is_none(), true);
+
+        let pass = w.get_by_name(String::from("E1M1"));
+        assert_eq!(pass.is_some(), true);
+
+        // check name and size 
+        let e1m1 = pass.unwrap();
+        assert_eq!(e1m1.get_name(), "E1M1");
+        
+        let e1m1_data = w.get_data_at_index(e1m1.get_index()).unwrap();
+        assert_eq!(e1m1.get_size(), e1m1_data.len());
     }
 }

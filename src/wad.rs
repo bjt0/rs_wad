@@ -82,6 +82,10 @@ impl Wad {
         self.directory.get_at_index(index)
     }
 
+    pub fn get_by_name(&self, name: String) -> Option<&Lump> {
+        self.directory.get_by_name(name)
+    }
+
     pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
         self.directory.get_data_at_index(index)
     }

@@ -20,6 +20,18 @@ impl Directory {
         Some(&self.lumps[index])
     }
 
+    pub fn get_by_name(&self, name: String) -> Option<&Lump> {
+        for lump in &self.lumps {
+            let matched = lump.get_name() == name;
+
+            if matched {
+                return Some(lump);
+            }
+        }
+        
+        None
+    }
+
     pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
         if index >= self.lumps.len() {
             return None
@@ -76,10 +88,13 @@ impl Directory {
             };
 
             let mut raw_data = vec![0; lump.size];
-            let lump_read = match file.read_exact(&mut raw_data) {
-                Ok(_) => { },
-                Err(why) => panic!("Error when reading data for lump {}. Reason: {}", lump.name, why.description())
-            };
+
+            if lump.size > 0 {
+                let lump_read = match file.read_exact(&mut raw_data) {
+                    Ok(_) => { },
+                    Err(why) => panic!("Error when reading data for lump {}. Reason: {}", lump.name, why.description())
+                };
+            }
 
             let lump_data = LumpData { index: lump.index, data: raw_data };
             cache.push(lump_data);
@@ -99,8 +114,12 @@ pub struct Lump {
 }
 
 impl Lump {
-    pub fn get_name(&self) -> &String {
-        &self.name
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn get_index(&self) -> usize {
+        self.index
     }
 
     pub fn get_size(&self) -> usize {
