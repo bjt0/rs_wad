@@ -36,7 +36,7 @@ impl Directory {
         for index in 0..header.num_lumps() {
             let mut entry_raw: [u8; 16] = [0; 16];
 
-            file.read(&mut entry_raw)
+            file.read_exact(&mut entry_raw)
                 .unwrap_or_else(|e| panic!("Error when reading lump {}: {}", index, e));
 
             // pointer to the start of the lump's data
