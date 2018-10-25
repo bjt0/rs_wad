@@ -12,11 +12,7 @@ pub struct Directory {
 
 impl Directory {
     pub fn get_at_index(&self, index: usize) -> Option<&Lump> {
-        if index >= self.lumps.len() {
-            return None;
-        }
-
-        Some(&self.lumps[index])
+        self.lumps.get(index)
     }
 
     pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
