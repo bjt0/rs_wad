@@ -21,23 +21,11 @@ impl Directory {
     }
 
     pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
-        for lump in &self.lumps {
-            let matched = lump.get_name() == name;
-
-            if matched {
-                return Some(lump);
-            }
-        }
-
-        None
+        self.lumps.iter().find(|lump| lump.get_name() == name)
     }
 
     pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
-        if index >= self.lumps.len() {
-            return None;
-        }
-
-        Some(&self.cache[index].data)
+        self.cache.get(index).map(|lump| &lump.data)
     }
 
     pub fn num_lumps(&self) -> usize {
