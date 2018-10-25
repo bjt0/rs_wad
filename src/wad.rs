@@ -88,10 +88,6 @@ impl Wad {
     pub fn from_path(path: &str) -> Wad {
         let path = Path::new(path);
 
-        if !path.exists() {
-            panic!("WAD file {} not found!", path.display());
-        }
-
         let wad_file = File::open(path).unwrap_or_else(|e| panic!("Unable to open WAD {}", e));
 
         Wad::from_file(&wad_file)
