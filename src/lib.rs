@@ -16,7 +16,7 @@ mod tests {
             _ => false,
         };
 
-        assert_eq!(pwad_check, true);
+        assert!(pwad_check);
 
         // GOETIA1.wad has 152 lumps in it
         assert_eq!(w.get_header().num_lumps(), 152);
@@ -44,10 +44,10 @@ mod tests {
 
         // this one should fail because GOETIA1.wad is a Doom 1 WAD
         let op = w.get_by_name("MAP01");
-        assert_eq!(op.is_none(), true);
+        assert!(op.is_none());
 
         let pass = w.get_by_name("E1M1");
-        assert_eq!(pass.is_some(), true);
+        assert!(pass.is_some());
 
         // check name and size
         let e1m1 = pass.unwrap();
