@@ -94,7 +94,7 @@ impl Wad {
         self.directory.get_at_index(index)
     }
 
-    pub fn get_by_name(&self, name: String) -> Option<&Lump> {
+    pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
         self.directory.get_by_name(name)
     }
 

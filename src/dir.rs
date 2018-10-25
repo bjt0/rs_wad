@@ -20,7 +20,7 @@ impl Directory {
         Some(&self.lumps[index])
     }
 
-    pub fn get_by_name(&self, name: String) -> Option<&Lump> {
+    pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
         for lump in &self.lumps {
             let matched = lump.get_name() == name;
 
@@ -95,8 +95,8 @@ impl Directory {
         let mut cache: Vec<LumpData> = Vec::new();
 
         for lump in &results {
-            let position = match file.seek(SeekFrom::Start(lump.location as u64)) {
-                Ok(pos) => pos,
+            match file.seek(SeekFrom::Start(lump.location as u64)) {
+                Ok(_) => {}
                 Err(why) => panic!(
                     "Unable to seek to the location of lump {}. Reason: {}",
                     lump.name,
@@ -107,7 +107,7 @@ impl Directory {
             let mut raw_data = vec![0; lump.size];
 
             if lump.size > 0 {
-                let lump_read = match file.read_exact(&mut raw_data) {
+                match file.read_exact(&mut raw_data) {
                     Ok(_) => {}
                     Err(why) => panic!(
                         "Error when reading data for lump {}. Reason: {}",
@@ -118,7 +118,7 @@ impl Directory {
             }
 
             let lump_data = LumpData {
-                index: lump.index,
+                _index: lump.index,
                 data: raw_data,
             };
             cache.push(lump_data);
@@ -166,6 +166,6 @@ impl fmt::Display for Lump {
 
 // basically just a wrapper for a u8 vec so that it doesn't look ugly when creating the cache
 pub struct LumpData {
-    index: usize,
+    _index: usize,
     data: Vec<u8>,
 }

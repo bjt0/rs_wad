@@ -43,10 +43,10 @@ mod tests {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
 
         // this one should fail because GOETIA1.wad is a Doom 1 WAD
-        let op = w.get_by_name(String::from("MAP01"));
+        let op = w.get_by_name("MAP01");
         assert_eq!(op.is_none(), true);
 
-        let pass = w.get_by_name(String::from("E1M1"));
+        let pass = w.get_by_name("E1M1");
         assert_eq!(pass.is_some(), true);
 
         // check name and size
