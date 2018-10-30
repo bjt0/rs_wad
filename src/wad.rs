@@ -5,6 +5,7 @@ use std::path::Path;
 use dir::{Directory, Lump};
 use utils;
 
+#[derive(PartialEq)]
 pub enum WadType {
     IWAD,
     PWAD,
