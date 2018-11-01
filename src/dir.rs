@@ -6,16 +6,16 @@ use utils;
 use wad::{Header, WadType};
 
 pub struct Directory {
-    lumps: Vec<Lump>,
+    lumps: Vec<WAD1Lump>,
     cache: Vec<LumpData>,
 }
 
 impl Directory {
-    pub fn get_at_index(&self, index: usize) -> Option<&Lump> {
+    pub fn get_at_index(&self, index: usize) -> Option<&WAD1Lump> {
         self.lumps.get(index)
     }
 
-    pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
+    pub fn get_by_name(&self, name: &str) -> Option<&WAD1Lump> {
         self.lumps.iter().find(|lump| lump.get_name() == name)
     }
 
@@ -31,8 +31,8 @@ impl Directory {
         file.seek(SeekFrom::Start(header.dir_offset() as u64))
             .unwrap_or_else(|e| panic!("Unable to seek to the start of the directory. ({})", e));
 
-        if header.wad_type() == &WadType::IWAD || header.wad_type() == &WadType::PWAD {
-            let mut results: Vec<Lump> = Vec::new();
+        if header.wad_type() == WadType::IWAD || header.wad_type() == WadType::PWAD {
+            let mut results: Vec<WAD1Lump> = Vec::new();
 
             for index in 0..header.num_lumps() {
                 let mut entry_raw: [u8; 16] = [0; 16];
@@ -53,7 +53,7 @@ impl Directory {
                 let trimmed_lump_name_str: String =
                     lump_name_str.trim_right_matches(char::from(0)).to_string();
 
-                let lump = Lump {
+                let lump = WAD1Lump {
                     name: trimmed_lump_name_str,
                     index,
                     size: lump_size,
@@ -95,7 +95,7 @@ impl Directory {
                 cache,
             }
         }
-        else if header.wad_type() == &WadType::WAD2 {
+        else if header.wad_type() == WadType::WAD2 {
             let mut results: Vec<WAD2Lump> = Vec::new();
 
             for index in 0..header.num_lumps() {
@@ -133,9 +133,44 @@ impl Directory {
     }
 }
 
-// TODO: make the concept of a "lump" into a trait and use it as a generic store for both WAD1 and WAD2 lumps
-// WAD2 lumps have a different format including compression type, etc
-pub struct Lump {
+pub struct WAD1Lump {
+    name: String,
+    index: usize,
+    size: usize,
+    location: usize,
+}
+
+impl WAD1Lump {
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn get_index(&self) -> usize {
+        self.index
+    }
+
+    pub fn get_size(&self) -> usize {
+        self.size
+    }
+}
+
+pub struct WAD2Lump {
+    name: String,
+    offset: u32,
+    index: usize,
+    wad_size: u32,
+    mem_size: u32,
+    entry_type: char,
+    compression: char
+}
+
+// basically just a wrapper for a u8 vec so that it doesn't look ugly when creating the cache
+pub struct LumpData {
+    _index: usize,
+    data: Vec<u8>,
+}
+
+/* pub struct Lump {
     name: String,
     index: usize,
     size: usize,
@@ -164,19 +199,4 @@ impl fmt::Display for Lump {
             self.name, self.index, self.size, self.location
         )
     }
-}
-
-pub struct WAD2Lump {
-    name: String,
-    offset: u32,
-    wad_size: u32,
-    mem_size: u32,
-    entry_type: char,
-    compression: char
-}
-
-// basically just a wrapper for a u8 vec so that it doesn't look ugly when creating the cache
-pub struct LumpData {
-    _index: usize,
-    data: Vec<u8>,
-}
+} */
