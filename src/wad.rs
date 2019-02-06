@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
 
-use dir::{Directory, WAD1Lump};
+use dir::{Directory, Lump};
 use utils;
 
 #[derive(Copy, Clone, PartialEq)]
@@ -10,6 +10,14 @@ pub enum WadType {
     IWAD,
     PWAD,
     WAD2,
+}
+
+pub enum CompressionType {
+    None
+}
+
+pub enum EntryType {
+    Doom
 }
 
 pub struct Header {
@@ -74,11 +82,11 @@ impl Wad {
         self.directory.num_lumps()
     }
 
-    pub fn get_at_index(&self, index: usize) -> Option<&WAD1Lump> {
+    pub fn get_at_index(&self, index: usize) -> Option<&Lump> {
         self.directory.get_at_index(index)
     }
 
-    pub fn get_by_name(&self, name: &str) -> Option<&WAD1Lump> {
+    pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
         self.directory.get_by_name(name)
     }
 

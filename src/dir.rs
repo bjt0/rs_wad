@@ -3,19 +3,19 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
 use utils;
-use wad::{Header, WadType};
+use wad::{Header, WadType, CompressionType, EntryType};
 
 pub struct Directory {
-    lumps: Vec<WAD1Lump>,
+    lumps: Vec<Lump>,
     cache: Vec<LumpData>,
 }
 
 impl Directory {
-    pub fn get_at_index(&self, index: usize) -> Option<&WAD1Lump> {
+    pub fn get_at_index(&self, index: usize) -> Option<&Lump> {
         self.lumps.get(index)
     }
 
-    pub fn get_by_name(&self, name: &str) -> Option<&WAD1Lump> {
+    pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
         self.lumps.iter().find(|lump| lump.get_name() == name)
     }
 
@@ -32,7 +32,7 @@ impl Directory {
             .unwrap_or_else(|e| panic!("Unable to seek to the start of the directory. ({})", e));
 
         if header.wad_type() == WadType::IWAD || header.wad_type() == WadType::PWAD {
-            let mut results: Vec<WAD1Lump> = Vec::new();
+            let mut results: Vec<Lump> = Vec::new();
 
             for index in 0..header.num_lumps() {
                 let mut entry_raw: [u8; 16] = [0; 16];
@@ -53,11 +53,14 @@ impl Directory {
                 let trimmed_lump_name_str: String =
                     lump_name_str.trim_right_matches(char::from(0)).to_string();
 
-                let lump = WAD1Lump {
+                let lump = Lump {
                     name: trimmed_lump_name_str,
+                    offset: dir_offset,
                     index,
-                    size: lump_size,
-                    location: dir_offset,
+                    wad_size: lump_size,
+                    mem_size: lump_size,
+                    entry_type: EntryType::Doom,
+                    compression: CompressionType::None
                 };
                 results.push(lump);
             }
@@ -66,7 +69,7 @@ impl Directory {
             let mut cache: Vec<LumpData> = Vec::new();
 
             for lump in &results {
-                file.seek(SeekFrom::Start(lump.location as u64))
+                file.seek(SeekFrom::Start(lump.wad_size as u64))
                     .unwrap_or_else(|e| {
                         panic!(
                             "Unable to seek to the location of lump {}. Reason: {}",
@@ -74,7 +77,7 @@ impl Directory {
                         )
                     });
 
-                let mut raw_data = vec![0; lump.size];
+                let mut raw_data = vec![0; lump.wad_size as usize];
 
                 file.read_exact(&mut raw_data).unwrap_or_else(|e| {
                     panic!(
@@ -96,7 +99,7 @@ impl Directory {
             }
         }
         else if header.wad_type() == WadType::WAD2 {
-            let mut results: Vec<WAD2Lump> = Vec::new();
+            let mut results: Vec<Lump> = Vec::new();
 
             for index in 0..header.num_lumps() {
                 let mut entry_raw: [u8; 32] = [0; 32];
@@ -133,14 +136,17 @@ impl Directory {
     }
 }
 
-pub struct WAD1Lump {
+pub struct Lump {
     name: String,
+    offset: usize,
     index: usize,
-    size: usize,
-    location: usize,
+    wad_size: usize,
+    mem_size: usize,
+    entry_type: EntryType,
+    compression: CompressionType
 }
 
-impl WAD1Lump {
+impl Lump {
     pub fn get_name(&self) -> String {
         self.name.clone()
     }
@@ -150,18 +156,8 @@ impl WAD1Lump {
     }
 
     pub fn get_size(&self) -> usize {
-        self.size
+        self.wad_size
     }
-}
-
-pub struct WAD2Lump {
-    name: String,
-    offset: u32,
-    index: usize,
-    wad_size: u32,
-    mem_size: u32,
-    entry_type: char,
-    compression: char
 }
 
 // basically just a wrapper for a u8 vec so that it doesn't look ugly when creating the cache
