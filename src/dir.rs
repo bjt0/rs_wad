@@ -115,17 +115,30 @@ impl Directory {
                 let lump_size: usize = utils::u8ref_to_u32(&entry_raw[8..12]) as usize;
 
                 // entry type
-                let lump_type: char = char::from(entry_raw[12]);
+                let lump_type_raw: char = char::from(entry_raw[12]);
+                let lump_type: EntryType = match lump_type_raw {
+                    '@' => EntryType::Palette, 
+                    'B' => EntryType::StatusBar,
+                    'D' => EntryType::Texture,
+                    'E' => EntryType::ConsolePic,
+                    _   => panic!("Could not determine the entry type of WAD2 lump {}", index)
+                };
+
                 // compression type
-                let compression_type: char = char::from(entry_raw[13]);
+                let compression_type: u8 = u8::from(entry_raw[13]);
+                
+                // bytes 14 and 15 aren't used for anything
+                // push all chars until we run into the null terminator
+                let mut lump_name: String = String::from("");
+                for name_char_index in 16..32 {
+                    let current: char = char::from(entry_raw[name_char_index]);
 
-                // there's an unused two byte dummy here
+                    if current == '\0' { 
+                        break; 
+                    }
 
-                // this is technically just ASCII, so I should probably change it but it works for now
-                let lump_name_str: String = String::from_utf8(entry_raw[16..32].to_vec())
-                    .unwrap_or_else(|e| panic!("Could not read entry name for {}: {}", index, e));
-
-                println!("{}", lump_name_str);
+                    lump_name.push(current);
+                }
             }
         }
 
@@ -140,8 +153,10 @@ pub struct Lump {
     name: String,
     offset: usize,
     index: usize,
+
     wad_size: usize,
     mem_size: usize,
+
     entry_type: EntryType,
     compression: CompressionType
 }

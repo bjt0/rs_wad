@@ -16,8 +16,13 @@ pub enum CompressionType {
     None
 }
 
+#[derive(Debug)]
 pub enum EntryType {
-    Doom
+    Doom, 
+    Palette, 
+    StatusBar,
+    Texture,
+    ConsolePic
 }
 
 pub struct Header {

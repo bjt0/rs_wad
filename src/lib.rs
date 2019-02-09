@@ -39,6 +39,11 @@ mod tests {
     }
 
     #[test]
+    fn read_q1_lump() {
+        let w: Wad = Wad::from_path("./METAL.WAD");
+    }
+
+    #[test]
     fn read_lump_by_name() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
 
