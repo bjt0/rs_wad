@@ -31,7 +31,7 @@ mod tests {
 
         // the first lump in GOETIA1 is WIMAP0 (an intermission screen background)
         let wimap = w.get_at_index(0).unwrap();
-        assert_eq!(wimap.get_name(), "WIMAP0");
+        assert_eq!(wimap.name(), "WIMAP0");
 
         // verify length of data
         let wimap_data = w.get_data_at_index(0).unwrap();
@@ -47,7 +47,7 @@ mod tests {
 
         // the first lump in METAL.WAD is PALETTE 
         let palette = w.get_at_index(0).unwrap();
-        assert_eq!(palette.get_name(), "PALETTE");
+        assert_eq!(palette.name(), "PALETTE");
 
         // entry type is palette
         assert_eq!(palette.entry_type(), EntryType::Palette);
@@ -71,9 +71,9 @@ mod tests {
 
         // check name and size
         let e1m1 = pass.unwrap();
-        assert_eq!(e1m1.get_name(), "E1M1");
+        assert_eq!(e1m1.name(), "E1M1");
 
-        let e1m1_data = w.get_data_at_index(e1m1.get_index()).unwrap();
+        let e1m1_data = w.get_data_at_index(e1m1.index()).unwrap();
         assert_eq!(e1m1.wad_size(), e1m1_data.len());
     }
 }

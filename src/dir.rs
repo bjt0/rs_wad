@@ -16,7 +16,7 @@ impl Directory {
     }
 
     pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
-        self.lumps.iter().find(|lump| lump.get_name() == name)
+        self.lumps.iter().find(|lump| lump.name() == name)
     }
 
     pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
@@ -181,11 +181,11 @@ pub struct Lump {
 }
 
 impl Lump {
-    pub fn get_name(&self) -> String {
+    pub fn name(&self) -> String {
         self.name.clone()
     }
 
-    pub fn get_index(&self) -> usize {
+    pub fn index(&self) -> usize {
         self.index
     }
 
