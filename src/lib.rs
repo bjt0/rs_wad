@@ -35,12 +35,27 @@ mod tests {
 
         // verify length of data
         let wimap_data = w.get_data_at_index(0).unwrap();
-        assert_eq!(wimap.get_size(), wimap_data.len());
+        assert_eq!(wimap.wad_size(), wimap_data.len());
     }
 
     #[test]
     fn read_q1_lump() {
         let w: Wad = Wad::from_path("./METAL.WAD");
+
+        // GOETIA1.wad has 99 lumps in it
+        assert_eq!(w.num_lumps(), 99);
+
+        // the first lump in METAL.WAD is PALETTE 
+        let palette = w.get_at_index(0).unwrap();
+        assert_eq!(palette.get_name(), "PALETTE");
+
+        // entry type is palette
+        assert_eq!(palette.entry_type(), EntryType::Palette);
+        // it has no compression
+        assert_eq!(palette.compression_type(), CompressionType::None);
+
+        // because it has no compression, the WAD size should be equal to the size in memory
+        assert_eq!(palette.wad_size(), palette.mem_size());
     }
 
     #[test]
@@ -59,6 +74,6 @@ mod tests {
         assert_eq!(e1m1.get_name(), "E1M1");
 
         let e1m1_data = w.get_data_at_index(e1m1.get_index()).unwrap();
-        assert_eq!(e1m1.get_size(), e1m1_data.len());
+        assert_eq!(e1m1.wad_size(), e1m1_data.len());
     }
 }

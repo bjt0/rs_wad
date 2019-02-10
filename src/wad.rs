@@ -12,11 +12,12 @@ pub enum WadType {
     WAD2,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CompressionType {
     None
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum EntryType {
     Doom, 
     Palette, 

@@ -112,7 +112,7 @@ impl Directory {
                 // the size of the lump in the WAD file (bytes)
                 let wad_size: usize = utils::u8ref_to_u32(&entry_raw[4..8]) as usize;
                 // the memory size of the lump (bytes)
-                let lump_size: usize = utils::u8ref_to_u32(&entry_raw[8..12]) as usize;
+                let mem_size: usize = utils::u8ref_to_u32(&entry_raw[8..12]) as usize;
 
                 // entry type
                 let lump_type_raw: char = char::from(entry_raw[12]);
@@ -125,7 +125,10 @@ impl Directory {
                 };
 
                 // compression type
-                let compression_type: u8 = u8::from(entry_raw[13]);
+                let compression_type_raw: u8 = u8::from(entry_raw[13]);
+                let compression_type: CompressionType = match compression_type_raw {
+                    _ => CompressionType::None
+                };
                 
                 // bytes 14 and 15 aren't used for anything
                 // push all chars until we run into the null terminator
@@ -139,6 +142,22 @@ impl Directory {
 
                     lump_name.push(current);
                 }
+
+                let lump = Lump {
+                    name: lump_name,
+                    offset: dir_offset,
+                    index,
+                    wad_size,
+                    mem_size,
+                    entry_type: lump_type,
+                    compression: compression_type
+                };
+                results.push(lump);
+            }
+
+            return Directory {
+                lumps: results,
+                cache: Vec::new(),
             }
         }
 
@@ -170,8 +189,20 @@ impl Lump {
         self.index
     }
 
-    pub fn get_size(&self) -> usize {
+    pub fn wad_size(&self) -> usize {
         self.wad_size
+    }
+
+    pub fn mem_size(&self) -> usize {
+        self.mem_size
+    }
+
+    pub fn entry_type(&self) -> EntryType {
+        self.entry_type.clone()
+    }
+
+    pub fn compression_type(&self) -> CompressionType {
+        self.compression.clone()
     }
 }
 
@@ -180,34 +211,3 @@ pub struct LumpData {
     _index: usize,
     data: Vec<u8>,
 }
-
-/* pub struct Lump {
-    name: String,
-    index: usize,
-    size: usize,
-    location: usize,
-}
-
-impl Lump {
-    pub fn get_name(&self) -> String {
-        self.name.clone()
-    }
-
-    pub fn get_index(&self) -> usize {
-        self.index
-    }
-
-    pub fn get_size(&self) -> usize {
-        self.size
-    }
-}
-
-impl fmt::Display for Lump {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}: index: {}, size: {}, location: {}",
-            self.name, self.index, self.size, self.location
-        )
-    }
-} */
