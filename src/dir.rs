@@ -1,9 +1,8 @@
-use std::fmt;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
 use utils;
-use wad::{Header, WadType, CompressionType, EntryType};
+use wad::{CompressionType, EntryType, Header, WadType};
 
 pub struct Directory {
     lumps: Vec<Lump>,
@@ -19,8 +18,8 @@ impl Directory {
         self.lumps.iter().find(|lump| lump.name() == name)
     }
 
-    pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
-        self.cache.get(index).map(|lump| &lump.data)
+    pub fn get_data_at_index(&self, index: usize) -> Option<&LumpData> {
+        self.cache.get(index)
     }
 
     pub fn num_lumps(&self) -> usize {
@@ -51,7 +50,7 @@ impl Directory {
 
                 // remove trailing unicode NULLs from the conversion
                 let trimmed_lump_name_str: String =
-                    lump_name_str.trim_right_matches(char::from(0)).to_string();
+                    lump_name_str.trim_end_matches(char::from(0)).to_string();
 
                 let lump = Lump {
                     name: trimmed_lump_name_str,
@@ -60,7 +59,7 @@ impl Directory {
                     wad_size: lump_size,
                     mem_size: lump_size,
                     entry_type: EntryType::Doom,
-                    compression: CompressionType::None
+                    compression: CompressionType::None,
                 };
                 results.push(lump);
             }
@@ -96,9 +95,8 @@ impl Directory {
             return Directory {
                 lumps: results,
                 cache,
-            }
-        }
-        else if header.wad_type() == WadType::WAD2 {
+            };
+        } else if header.wad_type() == WadType::WAD2 {
             let mut results: Vec<Lump> = Vec::new();
 
             for index in 0..header.num_lumps() {
@@ -117,27 +115,27 @@ impl Directory {
                 // entry type
                 let lump_type_raw: char = char::from(entry_raw[12]);
                 let lump_type: EntryType = match lump_type_raw {
-                    '@' => EntryType::Palette, 
+                    '@' => EntryType::Palette,
                     'B' => EntryType::StatusBar,
                     'D' => EntryType::Texture,
                     'E' => EntryType::ConsolePic,
-                    _   => panic!("Could not determine the entry type of WAD2 lump {}", index)
+                    _ => panic!("Could not determine the entry type of WAD2 lump {}", index),
                 };
 
                 // compression type
                 let compression_type_raw: u8 = u8::from(entry_raw[13]);
                 let compression_type: CompressionType = match compression_type_raw {
-                    _ => CompressionType::None
+                    _ => CompressionType::None,
                 };
-                
+
                 // bytes 14 and 15 aren't used for anything
                 // push all chars until we run into the null terminator
                 let mut lump_name: String = String::from("");
                 for name_char_index in 16..32 {
                     let current: char = char::from(entry_raw[name_char_index]);
 
-                    if current == '\0' { 
-                        break; 
+                    if current == '\0' {
+                        break;
                     }
 
                     lump_name.push(current);
@@ -150,7 +148,7 @@ impl Directory {
                     wad_size,
                     mem_size,
                     entry_type: lump_type,
-                    compression: compression_type
+                    compression: compression_type,
                 };
                 results.push(lump);
             }
@@ -158,7 +156,7 @@ impl Directory {
             return Directory {
                 lumps: results,
                 cache: Vec::new(),
-            }
+            };
         }
 
         Directory {
@@ -177,7 +175,7 @@ pub struct Lump {
     mem_size: usize,
 
     entry_type: EntryType,
-    compression: CompressionType
+    compression: CompressionType,
 }
 
 impl Lump {
@@ -210,4 +208,10 @@ impl Lump {
 pub struct LumpData {
     _index: usize,
     data: Vec<u8>,
+}
+
+impl LumpData {
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
 }

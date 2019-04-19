@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
 
-use dir::{Directory, Lump};
+use dir::{Directory, Lump, LumpData};
 use utils;
 
 #[derive(Copy, Clone, PartialEq)]
@@ -14,16 +14,16 @@ pub enum WadType {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CompressionType {
-    None
+    None,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum EntryType {
-    Doom, 
-    Palette, 
+    Doom,
+    Palette,
     StatusBar,
     Texture,
-    ConsolePic
+    ConsolePic,
 }
 
 pub struct Header {
@@ -96,13 +96,12 @@ impl Wad {
         self.directory.get_by_name(name)
     }
 
-    pub fn get_data_at_index(&self, index: usize) -> Option<&Vec<u8>> {
+    pub fn get_data_at_index(&self, index: usize) -> Option<&LumpData> {
         self.directory.get_data_at_index(index)
     }
 
     pub fn from_path(path: &str) -> Wad {
         let path = Path::new(path);
-
         let wad_file = File::open(path).unwrap_or_else(|e| panic!("Unable to open WAD {}", e));
 
         Wad::from_file(&wad_file)
@@ -113,5 +112,27 @@ impl Wad {
         let directory = Directory::from_file(file, &header);
 
         Wad { header, directory }
+    }
+}
+
+// represents a return type for retrieving lumps from wad file
+pub struct Entry<'a> {
+    wad: &'a Wad,
+    lump: &'a Lump,
+    data: &'a LumpData,
+}
+
+impl<'a> Entry<'a> {
+    pub fn from_index(wad: &'a Wad, index: usize) -> Entry {
+        let lump = wad
+            .get_at_index(index)
+            .expect(&format!("Couldn't retrieve lump at index {}", index));
+            
+        let data = wad.get_data_at_index(index).expect(&format!(
+            "Couldn't retrieve data for lump at index {}",
+            index
+        ));
+
+        Entry { wad, lump, data }
     }
 }

@@ -45,7 +45,7 @@ mod tests {
         // GOETIA1.wad has 99 lumps in it
         assert_eq!(w.num_lumps(), 99);
 
-        // the first lump in METAL.WAD is PALETTE 
+        // the first lump in METAL.WAD is PALETTE
         let palette = w.get_at_index(0).unwrap();
         assert_eq!(palette.name(), "PALETTE");
 
