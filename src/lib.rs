@@ -25,16 +25,17 @@ mod tests {
     #[test]
     fn read_lump() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
-
         // GOETIA1.wad has 152 lumps in it
         assert_eq!(w.num_lumps(), 152);
 
         // the first lump in GOETIA1 is WIMAP0 (an intermission screen background)
-        let wimap = w.get_at_index(0).unwrap();
+        let wimap_entry = w.get_at_index(0).unwrap();
+        let wimap = wimap_entry.lump_info();
+
         assert_eq!(wimap.name(), "WIMAP0");
 
         // verify length of data
-        let wimap_data = w.get_data_at_index(0).unwrap();
+        let wimap_data = wimap_entry.lump_data();
         assert_eq!(wimap.wad_size(), wimap_data.len());
     }
 
@@ -42,11 +43,13 @@ mod tests {
     fn read_q1_lump() {
         let w: Wad = Wad::from_path("./METAL.WAD");
 
-        // GOETIA1.wad has 99 lumps in it
+        // METAL.WAD has 99 lumps in it
         assert_eq!(w.num_lumps(), 99);
 
         // the first lump in METAL.WAD is PALETTE
-        let palette = w.get_at_index(0).unwrap();
+        let palette_entry = w.get_at_index(0).unwrap();
+        let palette = palette_entry.lump_info();
+
         assert_eq!(palette.name(), "PALETTE");
 
         // entry type is palette
@@ -63,6 +66,8 @@ mod tests {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
 
         // this one should fail because GOETIA1.wad is a Doom 1 WAD
+        // Doom 1 WADs have map name convention EXMX
+        // Doom 2 WADs have map name convention MAPXX
         let op = w.get_by_name("MAP01");
         assert!(op.is_none());
 
@@ -70,10 +75,11 @@ mod tests {
         assert!(pass.is_some());
 
         // check name and size
-        let e1m1 = pass.unwrap();
+        let e1m1_entry = pass.unwrap();
+        let e1m1 = e1m1_entry.lump_info();
         assert_eq!(e1m1.name(), "E1M1");
 
-        let e1m1_data = w.get_data_at_index(e1m1.index()).unwrap();
+        let e1m1_data = e1m1_entry.lump_data();
         assert_eq!(e1m1.wad_size(), e1m1_data.len());
     }
 }

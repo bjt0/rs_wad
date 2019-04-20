@@ -88,16 +88,12 @@ impl Wad {
         self.directory.num_lumps()
     }
 
-    pub fn get_at_index(&self, index: usize) -> Option<&Lump> {
-        self.directory.get_at_index(index)
+    pub fn get_at_index(&self, index: usize) -> Option<Entry> {
+        Entry::from_index(self, index)
     }
 
-    pub fn get_by_name(&self, name: &str) -> Option<&Lump> {
-        self.directory.get_by_name(name)
-    }
-
-    pub fn get_data_at_index(&self, index: usize) -> Option<&LumpData> {
-        self.directory.get_data_at_index(index)
+    pub fn get_by_name(&self, name: &str) -> Option<Entry> {
+        Entry::by_name(self, name)
     }
 
     pub fn from_path(path: &str) -> Wad {
@@ -117,22 +113,65 @@ impl Wad {
 
 // represents a return type for retrieving lumps from wad file
 pub struct Entry<'a> {
-    wad: &'a Wad,
+    wad:  &'a Wad,
     lump: &'a Lump,
     data: &'a LumpData,
 }
 
 impl<'a> Entry<'a> {
-    pub fn from_index(wad: &'a Wad, index: usize) -> Entry {
-        let lump = wad
-            .get_at_index(index)
-            .expect(&format!("Couldn't retrieve lump at index {}", index));
-            
-        let data = wad.get_data_at_index(index).expect(&format!(
-            "Couldn't retrieve data for lump at index {}",
-            index
-        ));
+    pub fn owner(&self) -> &'a Wad {
+        self.wad
+    }
 
-        Entry { wad, lump, data }
+    pub fn lump_info(&self) -> &'a Lump {
+        self.lump
+    }
+
+    pub fn lump_data(&self) -> &'a LumpData {
+        self.data
+    }
+
+    pub fn from_index(wad: &'a Wad, index: usize) -> Option<Entry<'a>> {
+        let lump_ref = wad.directory.get_at_index(index);
+        let data_ref = wad.directory.get_data_at_index(index);
+
+        if lump_ref.is_none() || data_ref.is_none() {
+            return None;
+        }
+
+        let ld: &Lump = lump_ref.unwrap();
+        let dt: &LumpData = data_ref.unwrap();
+
+        let result = Entry {
+            wad,
+            lump: ld,
+            data: dt,
+        };
+        Some(result)
+    }
+
+    pub fn by_name(wad: &'a Wad, name: &str) -> Option<Entry<'a>> {
+        let lump_ref = wad.directory.get_by_name(&name);
+
+        if lump_ref.is_none() {
+            return None;
+        }
+
+        let ld: &Lump = lump_ref.unwrap();
+        // we need the index of the lump with the given name to get the data ref
+        let data_ref = wad.directory.get_data_at_index(ld.index());
+
+        if data_ref.is_none() {
+            return None;
+        }
+
+        let dt: &LumpData = data_ref.unwrap();
+
+        let result = Entry {
+            wad,
+            lump: ld,
+            data: dt,
+        };
+        Some(result)
     }
 }

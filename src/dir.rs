@@ -30,9 +30,10 @@ impl Directory {
         file.seek(SeekFrom::Start(header.dir_offset() as u64))
             .unwrap_or_else(|e| panic!("Unable to seek to the start of the directory. ({})", e));
 
-        if header.wad_type() == WadType::IWAD || header.wad_type() == WadType::PWAD {
-            let mut results: Vec<Lump> = Vec::new();
+        let mut results: Vec<Lump> = Vec::new();
+        let mut cache: Vec<LumpData> = Vec::new();
 
+        if header.wad_type() == WadType::IWAD || header.wad_type() == WadType::PWAD {
             for index in 0..header.num_lumps() {
                 let mut entry_raw: [u8; 16] = [0; 16];
 
@@ -63,42 +64,7 @@ impl Directory {
                 };
                 results.push(lump);
             }
-
-            // borrow results to load data
-            let mut cache: Vec<LumpData> = Vec::new();
-
-            for lump in &results {
-                file.seek(SeekFrom::Start(lump.wad_size as u64))
-                    .unwrap_or_else(|e| {
-                        panic!(
-                            "Unable to seek to the location of lump {}. Reason: {}",
-                            lump.name, e
-                        )
-                    });
-
-                let mut raw_data = vec![0; lump.wad_size as usize];
-
-                file.read_exact(&mut raw_data).unwrap_or_else(|e| {
-                    panic!(
-                        "Error when reading data for lump {}. Reason: {}",
-                        lump.name, e
-                    )
-                });
-
-                let lump_data = LumpData {
-                    _index: lump.index,
-                    data: raw_data,
-                };
-                cache.push(lump_data);
-            }
-
-            return Directory {
-                lumps: results,
-                cache,
-            };
         } else if header.wad_type() == WadType::WAD2 {
-            let mut results: Vec<Lump> = Vec::new();
-
             for index in 0..header.num_lumps() {
                 let mut entry_raw: [u8; 32] = [0; 32];
 
@@ -152,17 +118,40 @@ impl Directory {
                 };
                 results.push(lump);
             }
+        }
 
-            return Directory {
-                lumps: results,
-                cache: Vec::new(),
+        // borrow results to load data
+        let mut cache: Vec<LumpData> = Vec::new();
+
+        for lump in &results {
+            file.seek(SeekFrom::Start(lump.wad_size as u64))
+                .unwrap_or_else(|e| {
+                    panic!(
+                        "Unable to seek to the location of lump {}. Reason: {}",
+                        lump.name, e
+                    )
+                });
+
+            let mut raw_data = vec![0; lump.wad_size as usize];
+
+            file.read_exact(&mut raw_data).unwrap_or_else(|e| {
+                panic!(
+                    "Error when reading data for lump {}. Reason: {}",
+                    lump.name, e
+                )
+            });
+
+            let lump_data = LumpData {
+                _index: lump.index,
+                data: raw_data,
             };
+            cache.push(lump_data);
         }
 
-        Directory {
-            lumps: Vec::new(),
-            cache: Vec::new(),
-        }
+        return Directory {
+            lumps: results,
+            cache,
+        };
     }
 }
 
