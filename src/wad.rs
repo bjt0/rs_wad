@@ -113,7 +113,7 @@ impl Wad {
 
 // represents a return type for retrieving lumps from wad file
 pub struct Entry<'a> {
-    wad:  &'a Wad,
+    wad: &'a Wad,
     lump: &'a Lump,
     data: &'a LumpData,
 }
