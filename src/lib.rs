@@ -1,9 +1,11 @@
 pub mod dir;
+pub mod doom;
 pub mod utils;
 pub mod wad;
 
 #[cfg(test)]
 mod tests {
+    use doom::*;
     use wad::*;
 
     #[test]
@@ -81,5 +83,16 @@ mod tests {
 
         let e1m1_data = e1m1_entry.lump_data();
         assert_eq!(e1m1.wad_size(), e1m1_data.len());
+    }
+
+    #[test]
+    fn iterate_over_doom_map() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
+
+        let pass = w.get_by_name("E1M1");
+        assert!(pass.is_some());
+
+        let mut e1m1_entry = pass.unwrap();
+        is_valid_map(e1m1_entry);
     }
 }

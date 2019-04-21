@@ -175,3 +175,24 @@ impl<'a> Entry<'a> {
         Some(result)
     }
 }
+
+impl<'a> Iterator for Entry<'a> {
+    type Item = Entry<'a>;
+
+    /// Returns the entry at the next index
+    fn next(&mut self) -> Option<Entry<'a>> {
+        let new_next_option = self.wad.get_at_index(self.lump_info().index() + 1);
+
+        if new_next_option.is_none() {
+            return None;
+        }
+
+        let new_next_entry = new_next_option.unwrap();
+        self.lump = new_next_entry.lump_info();
+        self.data = new_next_entry.lump_data();
+
+        // overwriting the entry details above and then just returning the original option I unwrapped
+        // Am I meant to do this? I don't think so. It works as intended though, so I don't know
+        self.wad.get_at_index(self.lump_info().index())
+    }
+}
