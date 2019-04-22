@@ -112,6 +112,7 @@ impl Wad {
 }
 
 // represents a return type for retrieving lumps from wad file
+#[derive(Copy, Clone)]
 pub struct Entry<'a> {
     wad: &'a Wad,
     lump: &'a Lump,
