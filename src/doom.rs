@@ -61,10 +61,10 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
 
             if required_map_lump {
                 if current_entry_match {
-                    println!(
+                    /* println!(
                         "map entry at index {} matches required lump {}",
                         index, DOOM_MAP_LUMPS[index]
-                    );
+                    ); */
 
                     current_entry_index = current_entry_index + 1;
                 } else {
@@ -72,10 +72,10 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
                 }
             } else if !required_map_lump {
                 if current_entry_match {
-                    println!(
+                    /* println!(
                         "map entry at index {} matches optional lump {}",
                         index, DOOM_MAP_LUMPS[index]
-                    );
+                    ); */
 
                     current_entry_index = current_entry_index + 1;
                 }
