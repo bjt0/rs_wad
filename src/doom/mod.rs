@@ -1,92 +1,40 @@
-extern crate regex;
+pub mod map;
 
-use std::collections::HashMap;
-use wad::Entry;
+#[cfg(test)]
+mod tests {
+    use wad::*;
+    use doom::map::*;
 
-const DOOM_MAP_LUMPS: [&'static str; 10] = [
-    "THINGS", "LINEDEFS", "SIDEDEFS", "VERTEXES", "SEGS", "SSECTORS", "NODES", "SECTORS", "REJECT",
-    "BLOCKMAP",
-];
+    #[test]
+    fn verify_valid_doom_map() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
 
-lazy_static! {
-    // the bool value determines whether the given lump is required for a map to be valid
-    // the REJECT table is optional because it's only used for quick line of sight checks and so can be omitted
-    static ref DOOM_MAP_LUMP_REQUIRED: HashMap<&'static str, bool> = {
-        let mut map_lumps = HashMap::new();
-        map_lumps.insert("THINGS", true);
-        map_lumps.insert("LINEDEFS", true);
-        map_lumps.insert("SIDEDEFS", true);
-        map_lumps.insert("VERTEXES", true);
-        map_lumps.insert("SEGS", true);
-        map_lumps.insert("SSECTORS", true);
-        map_lumps.insert("NODES", true);
-        map_lumps.insert("SECTORS", true);
-        map_lumps.insert("REJECT", false);
-        map_lumps.insert("BLOCKMAP", true);
-        map_lumps
-    };
-}
+        let pass = w.get_by_name("E1M1");
+        assert!(pass.is_some());
 
-pub fn is_valid_map(mut map_marker: Entry) -> bool {
-    let valid_doom1_map_marker = regex::Regex::new("E[0-9]M[0-9]").unwrap();
-    let valid_doom2_map_marker = regex::Regex::new("MAP[0-9][0-9]").unwrap();
+        let e1m1_entry = pass.unwrap();
+        assert!(is_valid_map(e1m1_entry.clone()));
+    }
 
-    let map_name: &str = &map_marker.lump_info().name();
+    #[test]
+    fn verify_missing_optional() {
+        let broken: Wad = Wad::from_path("./GOETIA1-BROKEN.wad");
+        // in GOETIA1-BROKEN.wad, E1M9 is deliberately missing it's REJECT table
+        let missing_e1m9 = broken.get_by_name("E1M9");
+        assert!(missing_e1m9.is_some());
 
-    if valid_doom1_map_marker.is_match(map_name) || valid_doom2_map_marker.is_match(map_name) {
-        // gather up all the lumps after the map marker if their name exists in the DOOM_MAP_LUMPS list
-        // end when we've found a lump that isn't in the DOOM_MAP_LUMPS list
-        // this could mean there's a bad lump in between or that we've found all the required lumps
-        let mut map_entries = Vec::new();
+        let e1m9_entry = missing_e1m9.unwrap();
+        assert!(is_valid_map(e1m9_entry.clone()));
+    }
 
-        while let Some(next_lump) = map_marker.next() {
-            let listed_lump = DOOM_MAP_LUMPS.contains(&&next_lump.lump_info().name()[..]); // ew
+    #[test]
+    fn detect_broken_doom_map() {
+        let broken: Wad = Wad::from_path("./GOETIA1-BROKEN.wad");
+        // in GOETIA1-BROKEN.wad, E1M3 is deliberately broken and doesn't include the SIDEDEFS and SECTORS lumps
+        let broken_e1m3 = broken.get_by_name("E1M3");
+        assert!(broken_e1m3.is_some());
 
-            if listed_lump {
-                map_entries.push(next_lump);
-            } else {
-                break;
-            }
-        }
-
-        // we now check the list of map entries that we've found
-        // 1. they need to be in the correct order
-        // 2. all the ones that are marked as required in the DOOM_MAP_LUMP_REQUIRED hashmap have to be found
-        let mut current_entry_index = 0;
-
-        for index in 0..DOOM_MAP_LUMPS.len() {
-            let required_map_lump = *DOOM_MAP_LUMP_REQUIRED.get(DOOM_MAP_LUMPS[index]).unwrap();
-            let current_entry_match =
-                map_entries[current_entry_index].lump_info().name() == DOOM_MAP_LUMPS[index];
-
-            if required_map_lump {
-                if current_entry_match {
-                    /* println!(
-                        "map entry at index {} matches required lump {}",
-                        index, DOOM_MAP_LUMPS[index]
-                    ); */
-
-                    current_entry_index = current_entry_index + 1;
-                } else {
-                    return false;
-                }
-            } else if !required_map_lump {
-                if current_entry_match {
-                    /* println!(
-                        "map entry at index {} matches optional lump {}",
-                        index, DOOM_MAP_LUMPS[index]
-                    ); */
-
-                    current_entry_index = current_entry_index + 1;
-                }
-                // if the current entry doesn't match we don't bother to increment the current_entry_index counter
-                // we check the same entry against the next lump name in the DOOM_MAP_LUMPS list
-                // this ensures that we verify all the entries in the map_entries vec and know that we have all required lumps in the correct order
-            }
-        }
-
-        return true;
-    } else {
-        return false;
+        let e1m3_entry = broken_e1m3.unwrap();
+        assert!(!is_valid_map(e1m3_entry.clone()));
     }
 }
