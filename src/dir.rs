@@ -31,7 +31,6 @@ impl Directory {
             .unwrap_or_else(|e| panic!("Unable to seek to the start of the directory. ({})", e));
 
         let mut results: Vec<Lump> = Vec::new();
-        let cache: Vec<LumpData> = Vec::new();
 
         if header.wad_type() == WadType::IWAD || header.wad_type() == WadType::PWAD {
             for index in 0..header.num_lumps() {

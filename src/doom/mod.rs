@@ -1,4 +1,21 @@
 pub mod map;
+pub mod thing;
+
+pub struct DoomPoint {
+    x_position: i16,
+    y_position: i16
+}
+
+pub enum DoomDirection {
+    East, 
+    Northeast,
+    North,
+    Northwest,
+    West,
+    Southwest,
+    South,
+    Southeast
+}
 
 #[cfg(test)]
 mod tests {
