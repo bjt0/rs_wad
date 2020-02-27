@@ -1,7 +1,7 @@
 extern crate regex;
 
 use std::collections::HashMap;
-use wad::Entry;
+use wad::*;
 
 const DOOM_MAP_LUMPS: [&'static str; 10] = [
     "THINGS", "LINEDEFS", "SIDEDEFS", "VERTEXES", "SEGS", "SSECTORS", "NODES", "SECTORS", "REJECT",
@@ -88,5 +88,61 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
         return true;
     } else {
         return false;
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct DoomMap {
+
+}
+
+impl<'a> DoomMap {
+    pub fn get_maps(wad: &'a Wad) -> DoomMapList {
+        let mut maps: Vec<DoomMap> = Vec::new();
+        let potential_maps = DoomMapList::get_potential_map_list();
+
+        for name in potential_maps {
+            let lump = wad.get_by_name(&name);
+
+            if lump.is_some() {
+                let entry = lump.unwrap();
+
+                if is_valid_map(entry) {
+                    maps.push(Self::get_map(entry));
+                }
+            }
+        }
+
+        DoomMapList { maps }
+    }
+
+    fn get_map(map_marker: Entry) -> Self {
+        DoomMap { }
+    }
+}
+
+pub struct DoomMapList {
+    maps: Vec<DoomMap>
+}
+
+impl<'a> DoomMapList {
+    pub fn get_potential_map_list() -> Vec<String> {
+        let mut map_names = Vec::new();
+
+        let ultdoom_episode_count = 4;
+        let ultdoom_map_count = 9;
+
+        for i in 1..ultdoom_episode_count + 1 {
+            for j in 1..ultdoom_map_count + 1 {
+                let map_name = format!("E{0}M{1}", i, j);
+                map_names.push(map_name);
+            }
+        }
+
+        map_names
+    }
+
+    pub fn count(&self) -> usize { 
+        self.maps.len()
     }
 }

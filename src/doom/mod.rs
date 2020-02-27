@@ -54,4 +54,11 @@ mod tests {
         let e1m3_entry = broken_e1m3.unwrap();
         assert!(!is_valid_map(e1m3_entry.clone()));
     }
+
+    #[test]
+    fn load_all_doom_maps() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
+        let maplist = DoomMap::get_maps(&w);
+        assert!(maplist.count() == 9); // there should be 9 maps in GOETIA1.wad 
+    }
 }

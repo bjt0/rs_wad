@@ -1,6 +1,7 @@
 use doom::*;
 
 pub enum DoomMonsterType {
+    Unknown = -1,
     Zombieman = 18, 
     ShotgunGuy = 9,
     Imp = 3001,
