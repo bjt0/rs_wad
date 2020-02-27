@@ -202,4 +202,9 @@ impl LumpData {
     pub fn len(&self) -> usize {
         self.data.len()
     }
+
+    // always return a copy of the data
+    pub fn raw_data(&self) -> Vec<u8> {
+        self.data.clone()
+    }
 }

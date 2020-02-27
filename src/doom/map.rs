@@ -1,6 +1,7 @@
 extern crate regex;
 
 use std::collections::HashMap;
+use utils::*;
 use wad::*;
 
 const DOOM_MAP_LUMPS: [&'static str; 10] = [
@@ -116,7 +117,18 @@ impl<'a> DoomMap {
         DoomMapList { maps }
     }
 
-    fn get_map(map_marker: Entry) -> Self {
+    fn get_map(mut map_marker: Entry) -> Self {
+        let map_name = map_marker.lump_info().name();
+
+        let things_lump = map_marker.next().unwrap();
+        let things_lump_info = things_lump.lump_info();
+        let things_lump_data = things_lump.lump_data();
+        let things_lump_raw_data = things_lump_data.raw_data();
+
+        // each doom thing entry is 10 bytes long
+        // ergo, there should be len / 10 things in the lump
+        let num_things = things_lump_data.len() / 10;
+        
         DoomMap { }
     }
 }
