@@ -124,7 +124,7 @@ impl Directory {
         let mut cache: Vec<LumpData> = Vec::new();
 
         for lump in &results {
-            file.seek(SeekFrom::Start(lump.wad_size as u64))
+            file.seek(SeekFrom::Start(lump.offset as u64))
                 .unwrap_or_else(|e| {
                     panic!(
                         "Unable to seek to the location of lump {}. Reason: {}",
