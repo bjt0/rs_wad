@@ -1,3 +1,5 @@
+extern crate byteorder;
+
 pub mod map;
 pub mod thing;
 
@@ -6,7 +8,14 @@ pub struct DoomPoint {
     y_position: i16
 }
 
+impl DoomPoint {
+    pub fn new(x: i16, y: i16) -> DoomPoint {
+        DoomPoint { x_position: x, y_position: y }
+    }
+}
+
 pub enum DoomDirection {
+    Unknown,
     East, 
     Northeast,
     North,
@@ -15,6 +24,22 @@ pub enum DoomDirection {
     Southwest,
     South,
     Southeast
+}
+
+impl DoomDirection {
+    pub fn from_angle(angle: u16) -> Self {
+        match angle {
+            0 => DoomDirection::East, 
+            45 => DoomDirection::Northeast,
+            90 => DoomDirection::North,
+            135 => DoomDirection::Northwest,
+            180 => DoomDirection::West,
+            225 => DoomDirection::Southwest,
+            270 => DoomDirection::South,
+            315 => DoomDirection::Southeast,
+            _ => DoomDirection::Unknown,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -134,6 +159,14 @@ mod tests {
     fn load_all_doom_maps() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
         let maplist = DoomMap::get_maps(&w);
-        assert!(maplist.count() == 9); // there should be 9 maps in GOETIA1.wad 
+        assert!(maplist.len() == 9); // there should be 9 maps in GOETIA1.wad 
+
+        for map in maplist {
+            println!("{}", map.name());
+
+            for thing in map.things() {
+                println!("{:?}", thing.thing_type());
+            }
+        }
     }
 }

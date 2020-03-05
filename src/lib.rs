@@ -1,10 +1,12 @@
+#[macro_use]
+extern crate lazy_static;
+extern crate num;
+extern crate num_derive;
+
 pub mod dir;
 pub mod doom;
 pub mod utils;
 pub mod wad;
-
-#[macro_use]
-extern crate lazy_static;
 
 #[cfg(test)]
 mod tests {

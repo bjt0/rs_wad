@@ -1,7 +1,7 @@
 extern crate regex;
 
+use doom::thing::*;
 use std::collections::HashMap;
-use utils::*;
 use wad::*;
 
 const DOOM_MAP_LUMPS: [&'static str; 10] = [
@@ -92,15 +92,23 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
     }
 }
 
-#[derive(Copy, Clone)]
 pub struct DoomMap {
-
+    name: String,
+    things: Vec<DoomThing>
 }
 
 impl<'a> DoomMap {
-    pub fn get_maps(wad: &'a Wad) -> DoomMapList {
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn things(&self) -> &Vec<DoomThing> {
+        &self.things
+    }
+
+    pub fn get_maps(wad: &'a Wad) -> Vec<DoomMap> {
         let mut maps: Vec<DoomMap> = Vec::new();
-        let potential_maps = DoomMapList::get_potential_map_list();
+        let potential_maps = DoomMap::get_potential_map_list();
 
         for name in potential_maps {
             let lump = wad.get_by_name(&name);
@@ -114,20 +122,18 @@ impl<'a> DoomMap {
             }
         }
 
-        DoomMapList { maps }
+        maps
     }
 
-    fn get_map(mut map_marker: Entry) -> Self {
-        DoomMap { }
+    pub fn get_map(mut map_marker: Entry) -> Self {
+        let name = map_marker.lump_info().name();
+        let things_lump = map_marker.next().unwrap();
+        let things = DoomThing::from_things_lump(things_lump);
+
+        DoomMap { name, things }
     }
-}
 
-pub struct DoomMapList {
-    maps: Vec<DoomMap>
-}
-
-impl<'a> DoomMapList {
-    pub fn get_potential_map_list() -> Vec<String> {
+    fn get_potential_map_list() -> Vec<String> {
         let mut map_names = Vec::new();
 
         let ultdoom_episode_count = 4;
@@ -141,9 +147,5 @@ impl<'a> DoomMapList {
         }
 
         map_names
-    }
-
-    pub fn count(&self) -> usize { 
-        self.maps.len()
     }
 }
