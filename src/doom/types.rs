@@ -8,7 +8,8 @@ pub enum DoomThingType {
     DoomAmmo(DoomAmmoType),
     DoomItem(DoomItemType),
     DoomMonster(DoomMonsterType),
-    DoomPowerup(DoomPowerupType)
+    DoomPowerup(DoomPowerupType),
+    DoomKey(DoomKeyType)
 }
 
 impl DoomThingType {
@@ -32,6 +33,10 @@ impl DoomThingType {
         let powerup_type = DoomPowerupType::from_u16(num);
 
         if powerup_type.is_some() { return DoomThingType::DoomPowerup(powerup_type.unwrap()) };
+        
+        let key_type = DoomKeyType::from_u16(num);
+
+        if key_type.is_some() { return DoomThingType::DoomKey(key_type.unwrap()) };
 
         return DoomThingType::Unknown;
     }
@@ -95,4 +100,14 @@ pub enum DoomPowerupType {
     BlueArmour = 2019,
     RadiationSuit = 2025,
     Stimpack = 2011
+}
+
+#[derive(Debug, FromPrimitive)]
+pub enum DoomKeyType {
+    RedKey = 13, 
+    BlueKey = 5,
+    YellowKey = 6,
+    RedSkullKey = 38,
+    BlueSkullKey = 40,
+    YellowSkullKey = 39
 }
