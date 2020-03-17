@@ -1,33 +1,7 @@
 use wad::Entry;
 use doom::{byteorder::ReadBytesExt, byteorder::LittleEndian, DoomDirection, DoomPoint};
 use std::io::Cursor;
-use num::{FromPrimitive};
-use num_derive::{FromPrimitive};
-
-#[derive(Debug, FromPrimitive)]
-pub enum DoomMonsterType {
-    Unknown = -1,
-    Zombieman = 18, 
-    ShotgunGuy = 9,
-    Imp = 3001,
-    Demon = 3002
-}
-
-#[derive(Debug)]
-pub enum DoomThingType {
-    Unknown,
-    DoomMonster(DoomMonsterType)
-}
-
-impl DoomThingType {
-    pub fn from_type_number(num: u16) -> Self {
-        let monster_type = DoomMonsterType::from_u16(num);
-
-        if monster_type.is_some() { return DoomThingType::DoomMonster(monster_type.unwrap()) };
-
-        return DoomThingType::Unknown;
-    }
-}
+use doom::types::*;
 
 pub enum DoomThingFlags {
     None,

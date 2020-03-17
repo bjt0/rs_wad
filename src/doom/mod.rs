@@ -2,6 +2,7 @@ extern crate byteorder;
 
 pub mod map;
 pub mod thing;
+pub mod types;
 
 pub struct DoomPoint {
     x_position: i16,
