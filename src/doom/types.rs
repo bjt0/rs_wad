@@ -3,17 +3,25 @@ use num_derive::{FromPrimitive};
 
 #[derive(Debug)]
 pub enum DoomThingType {
-    Unknown,
+    Unknown(u16),
+    DoomStart(DoomStartType),
     DoomWeapon(DoomWeaponType),
     DoomAmmo(DoomAmmoType),
     DoomItem(DoomItemType),
     DoomMonster(DoomMonsterType),
     DoomPowerup(DoomPowerupType),
-    DoomKey(DoomKeyType)
+    DoomKey(DoomKeyType),
+    DoomObstacle(DoomObstacleType),
+    DoomDecoration(DoomDecorationType),
+    DoomOther(DoomOtherType),
 }
 
 impl DoomThingType {
     pub fn from_type_number(num: u16) -> Self {
+        let start_type = DoomStartType::from_u16(num);
+
+        if start_type.is_some() { return DoomThingType::DoomStart(start_type.unwrap()) };
+
         let monster_type = DoomMonsterType::from_u16(num);
 
         if monster_type.is_some() { return DoomThingType::DoomMonster(monster_type.unwrap()) };
@@ -38,23 +46,43 @@ impl DoomThingType {
 
         if key_type.is_some() { return DoomThingType::DoomKey(key_type.unwrap()) };
 
-        return DoomThingType::Unknown;
+        let obstacle_type = DoomObstacleType::from_u16(num);
+
+        if obstacle_type.is_some() { return DoomThingType::DoomObstacle(obstacle_type.unwrap()) };
+
+        let deco_type = DoomDecorationType::from_u16(num);
+
+        if deco_type.is_some() { return DoomThingType::DoomDecoration(deco_type.unwrap()) };
+
+        let other_type = DoomOtherType::from_u16(num);
+
+        if other_type.is_some() { return DoomThingType::DoomOther(other_type.unwrap()) };
+
+        return DoomThingType::Unknown(num);
     }
 }
 
 #[derive(Debug, FromPrimitive)]
 pub enum DoomMonsterType {
-    Unknown = -1,
-    Zombieman = 18, 
-    ShotgunGuy = 9,
-    Imp = 3001,
-    Demon = 3002,
-    Spectre = 58,
-    Cacodemon = 3005,
-    LostSoul = 3006,
+    Arachnotron = 68, 
+    Archvile = 64, 
     BaronOfHell = 3003,
-    Cyberdemon = 16,
-    SpiderMastermind = 7
+    Cacodemon = 3005, 
+    CommanderKeen = 72, 
+    Cyberdemon = 16, 
+    Demon = 3002, 
+    Chaingunner = 65, 
+    HellKnight = 69, 
+    Imp = 3001, 
+    LostSoul = 3006, 
+    Mancubus = 67, 
+    PainElemental = 71, 
+    Revenant = 66, 
+    ShotgunGuy = 9,
+    Spectre = 58, 
+    Spiderdemon = 7, 
+    WolfensteinSS = 84, 
+    Zombieman = 3004
 }
 
 #[derive(Debug, FromPrimitive)]
@@ -110,4 +138,89 @@ pub enum DoomKeyType {
     RedSkullKey = 38,
     BlueSkullKey = 40,
     YellowSkullKey = 39
+}
+
+#[derive(Debug, FromPrimitive)]
+pub enum DoomStartType {
+    Player1Start = 1,
+    Player2Start = 2,
+    Player3Start = 3,
+    Player4Start = 4,
+    DeathmatchStart = 11
+}
+
+#[derive(Debug, FromPrimitive)]
+pub enum DoomOtherType {
+    TeleportLanding = 14,
+    IconOfSinSpawnSpot = 87,
+    JohnRomeroHead = 88,
+    IconOfSinMonsterSpawner = 89, 
+}
+
+#[derive(Debug, FromPrimitive)]
+pub enum DoomObstacleType {
+    BrownStump = 47, 
+    BurningBarrel = 70, 
+    BurntTree = 43, 
+    Candelabra = 35, 
+    EvilEye = 41, 
+    ExplodingBarrel = 2035, 
+    FiveSkullPole = 28,
+    FloatingSkull = 42, 
+    FloorLamp = 2028, 
+    HangingLeg = 53, 
+    HangingLegPair = 52,
+    HangingTorsoNoBrain = 78, 
+    HangingTorsoLookingDown = 75, 
+    HangingTorsoLookingUp = 77, 
+    HangingTorsoOpenSkull = 76,
+    // some of these are duplicated in decoration type but these block
+    HangingVictimArmsOut = 50, 
+    HangingVictimNoBrainsOrGuts = 74,
+    HangingVictimGutsRemoved = 73,
+    HangingVictimOneLeg = 51, 
+    HangingVictimTwitching = 49,
+    ImpaledHuman = 25,
+    LargeBrownTree = 54, 
+    PileOfSkullsWithCandles = 29,
+    ShortBlueFirestick = 55, 
+    ShortGreenFirestick = 56, 
+    ShortGreenPillar = 31,
+    ShortGreenPillarWithHeart = 36, 
+    ShortRedFirestick = 57, 
+    ShortRedPillar = 33,
+    ShortRedPillarWithSkull = 37, 
+    ShortTechnoFloorLamp = 86, 
+    SkullOnPole = 27,
+    TallBlueFirestick = 44, 
+    TallGreenFirestick = 45,
+    TallGreenPillar = 30,
+    TallRedFirestick = 46, 
+    TallRedPillar = 32, 
+    TallTechnoColumn = 48, 
+    TallTechnoFloorLamp = 85, 
+    TwitchingImpaledHuman = 26
+}
+
+#[derive(Debug, FromPrimitive)]
+pub enum DoomDecorationType {
+    BloodyMess1 = 10,
+    BloodyMess2 = 12, 
+    Candle = 34, 
+    DeadCacodemon = 22,
+    DeadDemon = 21,
+    DeadZombieman = 18,
+    DeadShotgunGuy = 19,
+    DeadImp = 20, 
+    DeadLostSoul = 23, // doesn't show anything
+    DeadPlayer = 15, 
+    HangingLeg = 62,
+    HangingPairOfLegs = 60,
+    HangingVictimArmsOut = 59,
+    HangingVictimOneLeg = 61, 
+    HangingVictimTwitching = 63,
+    PoolOfBlood1 = 79, 
+    PoolOfBlood2 = 80, 
+    PoolOfBloodAndFlesh = 24, 
+    PoolOfBrains = 81,
 }
