@@ -71,13 +71,6 @@ mod tests {
 
         assert!(things_lump_info.wad_size() == things_lump_raw_data.len());
 
-        // each doom thing entry is 10 bytes long
-        // ergo, there should be len / 10 things in the lump
-        let expected_num_things = 158; // GOETIA1.wad E1M1 has 158 THINGS entries
-        let num_things = things_lump_data.len() / 10;
-
-        assert!(num_things == expected_num_things);
-
         let linedefs_lump = map_marker.next().unwrap();
         let linedefs_lump_info = linedefs_lump.lump_info();
         let linedefs_lump_data = linedefs_lump.lump_data();
@@ -160,14 +153,13 @@ mod tests {
     fn load_all_doom_maps() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
         let maplist = DoomMap::get_maps(&w);
+        
         assert!(maplist.len() == 9); // there should be 9 maps in GOETIA1.wad 
 
-        for map in maplist {
-            println!("{}", map.name());
-
-            for thing in map.things() {
-                println!("{:?}", thing.thing_type());
-            }
-        }
+        let e1m1 = maplist.first().unwrap();
+        // each doom thing entry is 10 bytes long
+        // ergo, there should be len / 10 things in the lump
+        let expected_num_things = 158; // GOETIA1.wad E1M1 has 158 THINGS entries
+        assert!(e1m1.things().len() == expected_num_things);
     }
 }
