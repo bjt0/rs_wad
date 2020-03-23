@@ -1,17 +1,22 @@
 use wad::Entry;
+
 use doom::{byteorder::ReadBytesExt, byteorder::LittleEndian, DoomDirection, DoomPoint};
-use std::io::Cursor;
 use doom::types::*;
 
-pub enum DoomThingFlags {
-    None,
-    EasyDifficulty,
-    MediumDifficulty,
-    HardDifficulty,
-    Ambush,
-    DeathmatchOnly
+use std::io::Cursor;
+use bitflags::*;
+
+bitflags! {
+    struct DoomThingFlags: u16 {
+        const EASY    = 0b00000001;
+        const MEDIUM  = 0b00000010;
+        const HARD    = 0b00000100;
+        const AMBUSH  = 0b00001000;
+        const DM_ONLY = 0b00010000;
+    }
 }
 
+#[derive(Debug)]
 pub struct DoomThing {
     location: DoomPoint,
     direction: DoomDirection,
@@ -48,13 +53,13 @@ impl DoomThing {
                 read_cursor.read_u16::<LittleEndian>().unwrap()
             );
 
-            let thing_flags = read_cursor.read_u16::<LittleEndian>().unwrap();
+            let thing_flags = DoomThingFlags::from_bits(read_cursor.read_u16::<LittleEndian>().unwrap()).unwrap();
             
             let result = DoomThing { 
                 location,
                 direction, 
                 thing_type,
-                thing_flags: DoomThingFlags::None
+                thing_flags
             };
 
             things.push(result);

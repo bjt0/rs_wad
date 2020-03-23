@@ -4,6 +4,7 @@ pub mod map;
 pub mod thing;
 pub mod types;
 
+#[derive(Debug)]
 pub struct DoomPoint {
     x_position: i16,
     y_position: i16
@@ -15,6 +16,7 @@ impl DoomPoint {
     }
 }
 
+#[derive(Debug)]
 pub enum DoomDirection {
     Unknown,
     East, 
@@ -161,5 +163,8 @@ mod tests {
         // ergo, there should be len / 10 things in the lump
         let expected_num_things = 158; // GOETIA1.wad E1M1 has 158 THINGS entries
         assert!(e1m1.things().len() == expected_num_things);
+
+        let e1m9 = maplist.last().unwrap();
+        let first_thing_e1m9 = e1m9.things().first().unwrap();
     }
 }

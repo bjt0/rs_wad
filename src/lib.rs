@@ -2,6 +2,7 @@
 extern crate lazy_static;
 extern crate num;
 extern crate num_derive;
+extern crate bitflags;
 
 pub mod dir;
 pub mod doom;
