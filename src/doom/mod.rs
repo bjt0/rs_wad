@@ -48,7 +48,7 @@ impl DoomDirection {
 #[cfg(test)]
 mod tests {
     use wad::*;
-    use doom::map::*;
+    use doom::*;
 
     #[test]
     fn verify_valid_doom_map() {
@@ -58,7 +58,7 @@ mod tests {
         assert!(pass.is_some());
 
         let e1m1_entry = pass.unwrap();
-        assert!(is_valid_map(e1m1_entry.clone()));
+        assert!(map::is_valid_map(e1m1_entry.clone()));
     }
 
     #[test]
@@ -137,7 +137,7 @@ mod tests {
         assert!(missing_e1m9.is_some());
 
         let e1m9_entry = missing_e1m9.unwrap();
-        assert!(is_valid_map(e1m9_entry.clone()));
+        assert!(map::is_valid_map(e1m9_entry.clone()));
     }
 
     #[test]
@@ -148,23 +148,25 @@ mod tests {
         assert!(broken_e1m3.is_some());
 
         let e1m3_entry = broken_e1m3.unwrap();
-        assert!(!is_valid_map(e1m3_entry.clone()));
+        assert!(!map::is_valid_map(e1m3_entry.clone()));
     }
 
     #[test]
-    fn load_all_doom_maps() {
+    fn verify_all_thing_types() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
-        let maplist = DoomMap::get_maps(&w);
+        let maplist = map::DoomMap::get_maps(&w);
         
         assert!(maplist.len() == 9); // there should be 9 maps in GOETIA1.wad 
 
-        let e1m1 = maplist.first().unwrap();
-        // each doom thing entry is 10 bytes long
-        // ergo, there should be len / 10 things in the lump
-        let expected_num_things = 158; // GOETIA1.wad E1M1 has 158 THINGS entries
-        assert!(e1m1.things().len() == expected_num_things);
-
-        let e1m9 = maplist.last().unwrap();
-        let first_thing_e1m9 = e1m9.things().first().unwrap();
+        for map in maplist {
+            for thing in map.things() {
+                let unknown_thing = match thing.thing_type() {
+                    types::DoomThingType::Unknown(_) => true,
+                    _ => false
+                };
+                
+                assert_eq!(unknown_thing, false);
+            }
+        }
     }
 }

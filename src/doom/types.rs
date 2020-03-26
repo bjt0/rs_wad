@@ -1,7 +1,7 @@
 use num::{FromPrimitive};
 use num_derive::{FromPrimitive};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum DoomThingType {
     Unknown(u16),
     DoomStart(DoomStartType),
@@ -13,6 +13,7 @@ pub enum DoomThingType {
     DoomKey(DoomKeyType),
     DoomObstacle(DoomObstacleType),
     DoomDecoration(DoomDecorationType),
+    DoomEditor(DoomEditorType),
     DoomOther(DoomOtherType),
 }
 
@@ -58,11 +59,15 @@ impl DoomThingType {
 
         if other_type.is_some() { return DoomThingType::DoomOther(other_type.unwrap()) };
 
+        let editor_type = DoomEditorType::from_u16(num); 
+
+        if editor_type.is_some() { return DoomThingType::DoomEditor(editor_type.unwrap()) };
+
         return DoomThingType::Unknown(num);
     }
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomMonsterType {
     Arachnotron = 68, 
     Archvile = 64, 
@@ -85,7 +90,7 @@ pub enum DoomMonsterType {
     Zombieman = 3004
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomWeaponType {
     Shotgun = 2001,
     Chainsaw = 2005,
@@ -95,7 +100,7 @@ pub enum DoomWeaponType {
     BFG9000 = 2006
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomAmmoType {
     ShotgunShells = 2008,
     BoxOfBullets = 2048,
@@ -107,7 +112,7 @@ pub enum DoomAmmoType {
     Rocket = 2010
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomItemType {
     ArmourBonus = 2015,
     Berserk = 2023,
@@ -120,7 +125,7 @@ pub enum DoomItemType {
     Supercharge = 2013
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomPowerupType {
     GreenArmour = 2018,
     Backpack = 8,
@@ -130,7 +135,7 @@ pub enum DoomPowerupType {
     Stimpack = 2011
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomKeyType {
     RedKey = 13, 
     BlueKey = 5,
@@ -140,7 +145,7 @@ pub enum DoomKeyType {
     YellowSkullKey = 39
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomStartType {
     Player1Start = 1,
     Player2Start = 2,
@@ -149,7 +154,7 @@ pub enum DoomStartType {
     DeathmatchStart = 11
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomOtherType {
     TeleportLanding = 14,
     IconOfSinSpawnSpot = 87,
@@ -157,7 +162,7 @@ pub enum DoomOtherType {
     IconOfSinMonsterSpawner = 89, 
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomObstacleType {
     BrownStump = 47, 
     BurningBarrel = 70, 
@@ -202,7 +207,7 @@ pub enum DoomObstacleType {
     TwitchingImpaledHuman = 26
 }
 
-#[derive(Debug, FromPrimitive)]
+#[derive(Debug, PartialEq, FromPrimitive)]
 pub enum DoomDecorationType {
     BloodyMess1 = 10,
     BloodyMess2 = 12, 
@@ -223,4 +228,9 @@ pub enum DoomDecorationType {
     PoolOfBlood2 = 80, 
     PoolOfBloodAndFlesh = 24, 
     PoolOfBrains = 81,
+}
+
+#[derive(Debug, PartialEq, FromPrimitive)]
+pub enum DoomEditorType {
+    DoomBuilderCamera = 32000
 }
