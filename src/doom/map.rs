@@ -96,7 +96,7 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
 
 pub struct DoomMap {
     name: String,
-    things: Vec<DoomThing>,
+    things: Vec<Thing>,
     linedefs: Vec<Linedef>
 }
 
@@ -105,7 +105,7 @@ impl<'a> DoomMap {
         self.name.clone()
     }
 
-    pub fn things(&self) -> &Vec<DoomThing> {
+    pub fn things(&self) -> &Vec<Thing> {
         &self.things
     }
 
@@ -135,7 +135,7 @@ impl<'a> DoomMap {
     pub fn get_map(mut map_marker: Entry) -> Self {
         let name = map_marker.lump_info().name();
         let things_lump = map_marker.next().unwrap();
-        let things = DoomThing::from_things_lump(things_lump);
+        let things = Thing::from_things_lump(things_lump);
 
         let linedefs_lump = map_marker.next().unwrap();
         let linedefs = Linedef::from_linedefs_lump(linedefs_lump);

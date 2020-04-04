@@ -7,7 +7,7 @@ use std::io::Cursor;
 use bitflags::*;
 
 bitflags! {
-    struct DoomThingFlags: u16 {
+    struct ThingFlags: u16 {
         const EASY    = 0b00000001;
         const MEDIUM  = 0b00000010;
         const HARD    = 0b00000100;
@@ -17,19 +17,19 @@ bitflags! {
 }
 
 #[derive(Debug)]
-pub struct DoomThing {
+pub struct Thing {
     location: DoomPoint,
     direction: DoomDirection,
-    thing_type: DoomThingType,
-    thing_flags: DoomThingFlags
+    thing_type: ThingType,
+    thing_flags: ThingFlags
 }
 
-impl DoomThing {
-    pub fn thing_type(&self) -> &DoomThingType {
+impl Thing {
+    pub fn thing_type(&self) -> &ThingType {
         &self.thing_type
     }
 
-    pub fn from_things_lump(lump: Entry) -> Vec<DoomThing> {
+    pub fn from_things_lump(lump: Entry) -> Vec<Thing> {
         let mut things = Vec::new();
         let thing_size_bytes = 10;
         let num_things = lump.lump_info().wad_size() / thing_size_bytes;
@@ -49,13 +49,13 @@ impl DoomThing {
                 read_cursor.read_u16::<LittleEndian>().unwrap()
             );
 
-            let thing_type = DoomThingType::from_type_number(
+            let thing_type = ThingType::from_type_number(
                 read_cursor.read_u16::<LittleEndian>().unwrap()
             );
 
-            let thing_flags = DoomThingFlags::from_bits(read_cursor.read_u16::<LittleEndian>().unwrap()).unwrap();
+            let thing_flags = ThingFlags::from_bits(read_cursor.read_u16::<LittleEndian>().unwrap()).unwrap();
             
-            let result = DoomThing { 
+            let result = Thing { 
                 location,
                 direction, 
                 thing_type,

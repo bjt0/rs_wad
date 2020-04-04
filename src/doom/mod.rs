@@ -162,7 +162,7 @@ mod tests {
         for map in maplist {
             for thing in map.things() {
                 let unknown_thing = match thing.thing_type() {
-                    types::DoomThingType::Unknown(_) => true,
+                    types::ThingType::Unknown(_) => true,
                     _ => false
                 };
                 

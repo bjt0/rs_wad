@@ -2,73 +2,73 @@ use num::{FromPrimitive};
 use num_derive::{FromPrimitive};
 
 #[derive(Debug, PartialEq)]
-pub enum DoomThingType {
+pub enum ThingType {
     Unknown(u16),
-    DoomStart(DoomStartType),
-    DoomWeapon(DoomWeaponType),
-    DoomAmmo(DoomAmmoType),
-    DoomItem(DoomItemType),
-    DoomMonster(DoomMonsterType),
-    DoomPowerup(DoomPowerupType),
-    DoomKey(DoomKeyType),
-    DoomObstacle(DoomObstacleType),
-    DoomDecoration(DoomDecorationType),
-    DoomEditor(DoomEditorType),
-    DoomOther(DoomOtherType),
+    Start(StartType),
+    Weapon(WeaponType),
+    Ammo(AmmoType),
+    Item(ItemType),
+    Monster(MonsterType),
+    Powerup(PowerupType),
+    Key(KeyType),
+    Obstacle(ObstacleType),
+    Decoration(DecorationType),
+    Editor(EditorType),
+    Other(OtherType),
 }
 
-impl DoomThingType {
+impl ThingType {
     pub fn from_type_number(num: u16) -> Self {
-        let start_type = DoomStartType::from_u16(num);
+        let start_type = StartType::from_u16(num);
 
-        if start_type.is_some() { return DoomThingType::DoomStart(start_type.unwrap()) };
+        if start_type.is_some() { return ThingType::Start(start_type.unwrap()) };
 
-        let monster_type = DoomMonsterType::from_u16(num);
+        let monster_type = MonsterType::from_u16(num);
 
-        if monster_type.is_some() { return DoomThingType::DoomMonster(monster_type.unwrap()) };
+        if monster_type.is_some() { return ThingType::Monster(monster_type.unwrap()) };
 
-        let weapon_type = DoomWeaponType::from_u16(num);
+        let weapon_type = WeaponType::from_u16(num);
 
-        if weapon_type.is_some() { return DoomThingType::DoomWeapon(weapon_type.unwrap()) };
+        if weapon_type.is_some() { return ThingType::Weapon(weapon_type.unwrap()) };
 
-        let ammo_type = DoomAmmoType::from_u16(num);
+        let ammo_type = AmmoType::from_u16(num);
 
-        if ammo_type.is_some() { return DoomThingType::DoomAmmo(ammo_type.unwrap()) };
+        if ammo_type.is_some() { return ThingType::Ammo(ammo_type.unwrap()) };
 
-        let item_type = DoomItemType::from_u16(num);
+        let item_type = ItemType::from_u16(num);
 
-        if item_type.is_some() { return DoomThingType::DoomItem(item_type.unwrap()) };
+        if item_type.is_some() { return ThingType::Item(item_type.unwrap()) };
 
-        let powerup_type = DoomPowerupType::from_u16(num);
+        let powerup_type = PowerupType::from_u16(num);
 
-        if powerup_type.is_some() { return DoomThingType::DoomPowerup(powerup_type.unwrap()) };
+        if powerup_type.is_some() { return ThingType::Powerup(powerup_type.unwrap()) };
         
-        let key_type = DoomKeyType::from_u16(num);
+        let key_type = KeyType::from_u16(num);
 
-        if key_type.is_some() { return DoomThingType::DoomKey(key_type.unwrap()) };
+        if key_type.is_some() { return ThingType::Key(key_type.unwrap()) };
 
-        let obstacle_type = DoomObstacleType::from_u16(num);
+        let obstacle_type = ObstacleType::from_u16(num);
 
-        if obstacle_type.is_some() { return DoomThingType::DoomObstacle(obstacle_type.unwrap()) };
+        if obstacle_type.is_some() { return ThingType::Obstacle(obstacle_type.unwrap()) };
 
-        let deco_type = DoomDecorationType::from_u16(num);
+        let deco_type = DecorationType::from_u16(num);
 
-        if deco_type.is_some() { return DoomThingType::DoomDecoration(deco_type.unwrap()) };
+        if deco_type.is_some() { return ThingType::Decoration(deco_type.unwrap()) };
 
-        let other_type = DoomOtherType::from_u16(num);
+        let other_type = OtherType::from_u16(num);
 
-        if other_type.is_some() { return DoomThingType::DoomOther(other_type.unwrap()) };
+        if other_type.is_some() { return ThingType::Other(other_type.unwrap()) };
 
-        let editor_type = DoomEditorType::from_u16(num); 
+        let editor_type = EditorType::from_u16(num); 
 
-        if editor_type.is_some() { return DoomThingType::DoomEditor(editor_type.unwrap()) };
+        if editor_type.is_some() { return ThingType::Editor(editor_type.unwrap()) };
 
-        return DoomThingType::Unknown(num);
+        return ThingType::Unknown(num);
     }
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomMonsterType {
+pub enum MonsterType {
     Arachnotron = 68, 
     Archvile = 64, 
     BaronOfHell = 3003,
@@ -91,7 +91,7 @@ pub enum DoomMonsterType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomWeaponType {
+pub enum WeaponType {
     Shotgun = 2001,
     Chainsaw = 2005,
     Chaingun = 2002,
@@ -101,7 +101,7 @@ pub enum DoomWeaponType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomAmmoType {
+pub enum AmmoType {
     ShotgunShells = 2008,
     BoxOfBullets = 2048,
     BoxOfRockets = 2046,
@@ -113,7 +113,7 @@ pub enum DoomAmmoType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomItemType {
+pub enum ItemType {
     ArmourBonus = 2015,
     Berserk = 2023,
     ComputerAreaMap = 2026,
@@ -126,7 +126,7 @@ pub enum DoomItemType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomPowerupType {
+pub enum PowerupType {
     GreenArmour = 2018,
     Backpack = 8,
     Medikit = 2012,
@@ -136,7 +136,7 @@ pub enum DoomPowerupType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomKeyType {
+pub enum KeyType {
     RedKey = 13, 
     BlueKey = 5,
     YellowKey = 6,
@@ -146,7 +146,7 @@ pub enum DoomKeyType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomStartType {
+pub enum StartType {
     Player1Start = 1,
     Player2Start = 2,
     Player3Start = 3,
@@ -155,7 +155,7 @@ pub enum DoomStartType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomOtherType {
+pub enum OtherType {
     TeleportLanding = 14,
     IconOfSinSpawnSpot = 87,
     JohnRomeroHead = 88,
@@ -163,7 +163,7 @@ pub enum DoomOtherType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomObstacleType {
+pub enum ObstacleType {
     BrownStump = 47, 
     BurningBarrel = 70, 
     BurntTree = 43, 
@@ -208,7 +208,7 @@ pub enum DoomObstacleType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomDecorationType {
+pub enum DecorationType {
     BloodyMess1 = 10,
     BloodyMess2 = 12, 
     Candle = 34, 
@@ -231,6 +231,6 @@ pub enum DoomDecorationType {
 }
 
 #[derive(Debug, PartialEq, FromPrimitive)]
-pub enum DoomEditorType {
-    DoomBuilderCamera = 32000
+pub enum EditorType {
+    BuilderCamera = 32000
 }
