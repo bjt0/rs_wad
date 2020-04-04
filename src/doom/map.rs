@@ -1,6 +1,8 @@
 extern crate regex;
 
 use doom::thing::*;
+use doom::linedef::*;
+
 use std::collections::HashMap;
 use wad::*;
 
@@ -94,7 +96,8 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
 
 pub struct DoomMap {
     name: String,
-    things: Vec<DoomThing>
+    things: Vec<DoomThing>,
+    linedefs: Vec<Linedef>
 }
 
 impl<'a> DoomMap {
@@ -104,6 +107,10 @@ impl<'a> DoomMap {
 
     pub fn things(&self) -> &Vec<DoomThing> {
         &self.things
+    }
+
+    pub fn linedefs(&self) -> &Vec<Linedef> {
+        &self.linedefs
     }
 
     pub fn get_maps(wad: &'a Wad) -> Vec<DoomMap> {
@@ -130,7 +137,10 @@ impl<'a> DoomMap {
         let things_lump = map_marker.next().unwrap();
         let things = DoomThing::from_things_lump(things_lump);
 
-        DoomMap { name, things }
+        let linedefs_lump = map_marker.next().unwrap();
+        let linedefs = Linedef::from_linedefs_lump(linedefs_lump);
+
+        DoomMap { name, things, linedefs }
     }
 
     fn get_potential_map_list() -> Vec<String> {

@@ -2,6 +2,7 @@ extern crate byteorder;
 
 pub mod map;
 pub mod thing;
+pub mod linedef;
 pub mod types;
 
 #[derive(Debug)]
@@ -152,7 +153,7 @@ mod tests {
     }
 
     #[test]
-    fn verify_all_thing_types() {
+    fn verify_all_thing_types_loaded() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
         let maplist = map::DoomMap::get_maps(&w);
         
@@ -166,6 +167,18 @@ mod tests {
                 };
                 
                 assert_eq!(unknown_thing, false);
+            }
+        }
+    }
+
+    #[test]
+    fn load_linedefs() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
+        let maplist = map::DoomMap::get_maps(&w);
+
+        for map in maplist {
+            for linedef in map.linedefs() {
+
             }
         }
     }
