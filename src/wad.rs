@@ -17,7 +17,7 @@ pub enum CompressionType {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub enum EntryType {
+pub enum LumpDataType {
     Doom,
     Palette,
     StatusBar,
@@ -114,7 +114,7 @@ impl Wad {
             index: usize,
             wad_size: usize,
             mem_size: usize,
-            entry_type: EntryType,
+            entry_type: LumpDataType,
             compression: CompressionType,
         }
 
@@ -146,7 +146,7 @@ impl Wad {
                     index,
                     wad_size: lump_size,
                     mem_size: lump_size,
-                    entry_type: EntryType::Doom,
+                    entry_type: LumpDataType::Doom,
                     compression: CompressionType::None,
                 });
             }
@@ -166,11 +166,11 @@ impl Wad {
 
                 // entry type
                 let lump_type_raw: char = char::from(entry_raw[12]);
-                let lump_type: EntryType = match lump_type_raw {
-                    '@' => EntryType::Palette,
-                    'B' => EntryType::StatusBar,
-                    'D' => EntryType::Texture,
-                    'E' => EntryType::ConsolePic,
+                let lump_type: LumpDataType = match lump_type_raw {
+                    '@' => LumpDataType::Palette,
+                    'B' => LumpDataType::StatusBar,
+                    'D' => LumpDataType::Texture,
+                    'E' => LumpDataType::ConsolePic,
                     _ => panic!("Could not determine the entry type of WAD2 lump {}", index),
                 };
 
@@ -258,7 +258,7 @@ impl Lump {
 // basically just a wrapper for a u8 vec so that it doesn't look ugly when creating the cache
 pub struct LumpData {
     bytes: Vec<u8>,
-    data_type: EntryType,
+    data_type: LumpDataType,
     compression: CompressionType,
 }
 
@@ -267,7 +267,7 @@ impl LumpData {
         self.bytes.len()
     }
 
-    pub fn data_type(&self) -> EntryType {
+    pub fn data_type(&self) -> LumpDataType {
         self.data_type.clone()
     }
 

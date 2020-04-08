@@ -55,7 +55,7 @@ mod tests {
         assert_eq!(palette.name(), "PALETTE");
 
         // entry type is palette
-        assert_eq!(palette.data().data_type(), EntryType::Palette);
+        assert_eq!(palette.data().data_type(), LumpDataType::Palette);
         // it has no compression
         assert_eq!(palette.data().compression_type(), CompressionType::None);
 
