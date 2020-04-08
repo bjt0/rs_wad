@@ -32,12 +32,12 @@ impl Thing {
     pub fn from_things_lump(lump: Entry) -> Vec<Thing> {
         let mut things = Vec::new();
         let thing_size_bytes = 10;
-        let num_things = lump.lump_info().wad_size() / thing_size_bytes;
+        let num_things = lump.lump().data().len() / thing_size_bytes;
 
         for index in 0..num_things {
             let offset1 = thing_size_bytes * index;
             let offset2 = offset1 + thing_size_bytes;
-            let thing_data = lump.lump_data().raw_data()[offset1..offset2].to_vec();
+            let thing_data = lump.lump().data().bytes()[offset1..offset2].to_vec();
             let mut read_cursor = Cursor::new(thing_data);
 
             let location = DoomPoint::new(

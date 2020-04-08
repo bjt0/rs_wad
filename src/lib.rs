@@ -4,7 +4,6 @@ extern crate num;
 extern crate num_derive;
 extern crate bitflags;
 
-pub mod dir;
 pub mod doom;
 pub mod utils;
 pub mod wad;
@@ -33,17 +32,15 @@ mod tests {
     fn read_lump() {
         let w: Wad = Wad::from_path("./GOETIA1.wad");
         // GOETIA1.wad has 152 lumps in it
-        assert_eq!(w.num_lumps(), 152);
+        assert_eq!(w.lumps().len(), 152);
 
         // the first lump in GOETIA1 is WIMAP0 (an intermission screen background)
         let wimap_entry = w.get_at_index(0).unwrap();
-        let wimap = wimap_entry.lump_info();
+        assert_eq!(wimap_entry.lump().name(), "WIMAP0");
 
-        assert_eq!(wimap.name(), "WIMAP0");
-
+        let wimap_size = 66888;
         // verify length of data
-        let wimap_data = wimap_entry.lump_data();
-        assert_eq!(wimap.wad_size(), wimap_data.len());
+        assert_eq!(wimap_entry.lump().data().len(), wimap_size);
     }
 
     #[test]
@@ -51,21 +48,22 @@ mod tests {
         let w: Wad = Wad::from_path("./METAL.WAD");
 
         // METAL.WAD has 99 lumps in it
-        assert_eq!(w.num_lumps(), 99);
+        assert_eq!(w.lumps().len(), 99);
 
         // the first lump in METAL.WAD is PALETTE
         let palette_entry = w.get_at_index(0).unwrap();
-        let palette = palette_entry.lump_info();
+        let palette = palette_entry.lump();
 
         assert_eq!(palette.name(), "PALETTE");
 
         // entry type is palette
-        assert_eq!(palette.entry_type(), EntryType::Palette);
+        assert_eq!(palette.data().data_type(), LumpDataType::Palette);
         // it has no compression
-        assert_eq!(palette.compression_type(), CompressionType::None);
+        assert_eq!(palette.data().compression_type(), CompressionType::None);
 
+        let palette_size = 768;
         // because it has no compression, the WAD size should be equal to the size in memory
-        assert_eq!(palette.wad_size(), palette.mem_size());
+        assert_eq!(palette.data().len(), palette_size);
     }
 
     #[test]
@@ -83,10 +81,9 @@ mod tests {
 
         // check name and size
         let e1m1_entry = pass.unwrap();
-        let e1m1 = e1m1_entry.lump_info();
-        assert_eq!(e1m1.name(), "E1M1");
+        assert_eq!(e1m1_entry.lump().name(), "E1M1");
 
-        let e1m1_data = e1m1_entry.lump_data();
-        assert_eq!(e1m1.wad_size(), e1m1_data.len());
+        let e1m1_size = 0;
+        assert_eq!(e1m1_entry.lump().data().len(), e1m1_size);
     }
 }

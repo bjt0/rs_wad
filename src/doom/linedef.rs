@@ -35,13 +35,13 @@ impl Linedef {
     pub fn from_linedefs_lump(lump: Entry) -> Vec<Linedef> {
         let linedefs = Vec::new();
         let linedef_size_bytes = 14;
-        let num_lindefs = lump.lump_info().wad_size() / linedef_size_bytes;
+        let num_lindefs = lump.lump().data().len() / linedef_size_bytes;
 
         for index in 0..num_lindefs {
             let offset1 = linedef_size_bytes * index;
             let offset2 = offset1 + linedef_size_bytes;
 
-            let linedef_data = lump.lump_data().raw_data()[offset1..offset2].to_vec();            
+            let linedef_data = lump.lump().data().bytes()[offset1..offset2].to_vec();            
             let mut read_cursor = Cursor::new(linedef_data);
 
             let vertex_index_1 = read_cursor.read_u16::<LittleEndian>().unwrap();
