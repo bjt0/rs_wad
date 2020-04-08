@@ -31,7 +31,7 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
     let valid_doom1_map_marker = regex::Regex::new("E[0-9]M[0-9]").unwrap();
     let valid_doom2_map_marker = regex::Regex::new("MAP[0-9][0-9]").unwrap();
 
-    let map_name: &str = &map_marker.lump_info().name();
+    let map_name: &str = &map_marker.lump().name();
 
     if valid_doom1_map_marker.is_match(map_name) || valid_doom2_map_marker.is_match(map_name) {
         // gather up all the lumps after the map marker if their name exists in the DOOM_MAP_LUMPS list
@@ -40,7 +40,7 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
         let mut map_entries = Vec::new();
 
         while let Some(next_lump) = map_marker.next() {
-            let listed_lump = DOOM_MAP_LUMPS.contains(&&next_lump.lump_info().name()[..]); // ew
+            let listed_lump = DOOM_MAP_LUMPS.contains(&&next_lump.lump().name()[..]); // ew
 
             if listed_lump {
                 map_entries.push(next_lump);
@@ -57,26 +57,16 @@ pub fn is_valid_map(mut map_marker: Entry) -> bool {
         for index in 0..DOOM_MAP_LUMPS.len() {
             let required_map_lump = *DOOM_MAP_LUMP_REQUIRED.get(DOOM_MAP_LUMPS[index]).unwrap();
             let current_entry_match =
-                map_entries[current_entry_index].lump_info().name() == DOOM_MAP_LUMPS[index];
+                map_entries[current_entry_index].lump().name() == DOOM_MAP_LUMPS[index];
 
             if required_map_lump {
                 if current_entry_match {
-                    /* println!(
-                        "map entry at index {} matches required lump {}",
-                        index, DOOM_MAP_LUMPS[index]
-                    ); */
-
                     current_entry_index = current_entry_index + 1;
                 } else {
                     return false;
                 }
             } else if !required_map_lump {
                 if current_entry_match {
-                    /* println!(
-                        "map entry at index {} matches optional lump {}",
-                        index, DOOM_MAP_LUMPS[index]
-                    ); */
-
                     current_entry_index = current_entry_index + 1;
                 }
                 // if the current entry doesn't match we don't bother to increment the current_entry_index counter

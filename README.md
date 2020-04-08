@@ -18,12 +18,10 @@ A Rust library for loading .WAD files (Doom, Quake, etc)
 
 #### Get raw lump data 
     let e1m1_entry = w.get_by_name("E1M1").unwrap();
-    let e1m1_info = e1m1_entry.lump_info(); // returns a reference to Lump struct
-    let e1m1_data = e1m1_entry.lump_data(); // returns a reference to LumpData struct
 
     // the E1M1 lump is what is known as a marker 
     // it signifies the start of the Doom map E1M1 (Hangar in DOOM.WAD)
     // all the map data is contained in subsequent lumps, such as the THINGS lump
-    // this contains all data for monster and items in the level
-    assert_eq!(e1m1_info.wad_size(), 0);
-    assert_eq!(e1m1_data.len(), 0);
+    // as such, this lump will be 0 length
+    assert_eq!(e1m1_entry.lump().name(), "E1M1");
+    assert_eq!(e1m1_entry.lump().data().len(), 0);
