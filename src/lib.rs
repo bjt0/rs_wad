@@ -93,6 +93,9 @@ mod tests {
         assert!(pass.is_some());
 
         let e1m1_entry = pass.unwrap();
+        // E1M1 should be a marker
+        assert_eq!(e1m1_entry.lump().data().data_type(), LumpDataType::Marker);
+
         assert!(is_valid_map(e1m1_entry.clone()));
     }
 

@@ -19,6 +19,7 @@ pub enum CompressionType {
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum LumpDataType {
     Doom,
+    Marker,
     Palette,
     StatusBar,
     Texture,
@@ -114,7 +115,7 @@ impl Wad {
             index: usize,
             wad_size: usize,
             mem_size: usize,
-            entry_type: LumpDataType,
+            data_type: LumpDataType,
             compression: CompressionType,
         }
 
@@ -146,7 +147,7 @@ impl Wad {
                     index,
                     wad_size: lump_size,
                     mem_size: lump_size,
-                    entry_type: LumpDataType::Doom,
+                    data_type: LumpDataType::Doom,
                     compression: CompressionType::None,
                 });
             }
@@ -199,7 +200,7 @@ impl Wad {
                     index,
                     wad_size,
                     mem_size,
-                    entry_type: lump_type,
+                    data_type: lump_type,
                     compression: compression_type,
                 });
             }
@@ -226,11 +227,13 @@ impl Wad {
                 )
             });
 
+            let is_marker = raw_data.len() == 0;
+
             lumps.push(Lump {
                 name: wadlump.name.clone(),
                 data: LumpData {
                     bytes: raw_data, 
-                    data_type: wadlump.entry_type,
+                    data_type: if is_marker { LumpDataType::Marker } else { wadlump.data_type },
                     compression: wadlump.compression
                 }
             });
