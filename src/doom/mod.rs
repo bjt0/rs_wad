@@ -2,8 +2,10 @@ extern crate byteorder;
 
 pub mod map;
 pub mod thing;
-pub mod linedef;
 pub mod types;
+pub mod linedef;
+pub mod sidedef;
+pub mod vertex;
 
 #[derive(Debug)]
 pub struct DoomPoint {
@@ -12,6 +14,14 @@ pub struct DoomPoint {
 }
 
 impl DoomPoint {
+    pub fn x(&self) -> i16 {
+        self.x_position
+    }
+
+    pub fn y(&self) -> i16 {
+        self.y_position
+    }
+
     pub fn new(x: i16, y: i16) -> DoomPoint {
         DoomPoint { x_position: x, y_position: y }
     }

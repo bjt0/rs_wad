@@ -2,6 +2,8 @@ extern crate regex;
 
 use doom::thing::*;
 use doom::linedef::*;
+use doom::sidedef::*;
+use doom::vertex::*;
 
 use std::collections::HashMap;
 use wad::*;
@@ -88,7 +90,9 @@ pub struct DoomMap<'a> {
     wad: &'a Wad,
     name: String,
     things: Vec<Thing>,
-    linedefs: Vec<Linedef>
+    linedefs: Vec<Linedef>,
+    sidedefs: Vec<Sidedef>,
+    vertexes: Vec<Vertex>,
 }
 
 impl<'a> DoomMap<'a> {
@@ -129,12 +133,14 @@ impl<'a> DoomMap<'a> {
         let things_lump   = map_marker.next().unwrap();
         let linedefs_lump = map_marker.next().unwrap();
         let sidedefs_lump = map_marker.next().unwrap();
-        // these are created by a nodebuilder
         let vertexes_lump = map_marker.next().unwrap();
+        
+        // these are created by a nodebuilder
         let segs_lump     = map_marker.next().unwrap();
         let ssectors_lump = map_marker.next().unwrap();
         let nodes_lump    = map_marker.next().unwrap();
         let sectors_lump  = map_marker.next().unwrap();
+
         // REJECT lump can be omitted, so we check whether this is REJECT lump or BLOCKMAP
         let after_sectors_lump = map_marker.next().unwrap();
         let mut has_reject_lump = false;
@@ -143,12 +149,12 @@ impl<'a> DoomMap<'a> {
             has_reject_lump = true;
         } 
 
-        //let reject_lump = if has_reject_lump { after_sectors_lump } else { Entry::none };
-
         let things = Thing::from_things_lump(things_lump);
         let linedefs = Linedef::from_linedefs_lump(linedefs_lump);
+        let sidedefs = Sidedef::from_lump(sidedefs_lump.lump());
+        let vertexes = Vertex::from_lump(vertexes_lump.lump());
 
-        DoomMap { wad: map_marker.owner(), name, things, linedefs }
+        DoomMap { wad: map_marker.owner(), name, things, linedefs, sidedefs, vertexes }
     }
 
     fn get_potential_map_list() -> Vec<String> {
