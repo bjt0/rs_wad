@@ -150,15 +150,15 @@ mod tests {
         }
     }
 
-    #[test]
-    fn load_linedefs() {
-        let w: Wad = Wad::from_path("./GOETIA1.wad");
-        let maplist = map::DoomMap::get_maps(&w);
+    // #[test]
+    // fn load_linedefs() {
+    //     let w: Wad = Wad::from_path("./GOETIA1.wad");
+    //     let maplist = map::DoomMap::get_maps(&w);
 
-        for map in maplist {
-            for linedef in map.linedefs() {
-
-            }
-        }
-    }
+    //     for map in maplist {
+    //         for linedef in map.linedefs() {
+                
+    //         }
+    //     }
+    // }
 }

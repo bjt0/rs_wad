@@ -4,7 +4,7 @@ use std::io::Cursor;
 use bitflags::*;
 
 bitflags! {
-    struct LinedefFlags: u16 {
+    pub struct LinedefFlags: u16 {
         const IMPASSABLE = 0b0000000000000001;
         const BLOCKS_MONSTERS = 0b0000000000000010;
         const TWO_SIDED = 0b0000000000000100;
@@ -32,8 +32,12 @@ pub struct Linedef {
 }
 
 impl Linedef {
+    pub fn flags(&self) -> LinedefFlags {
+        self.linedef_flags.clone()
+    }
+
     pub fn from_linedefs_lump(lump: Entry) -> Vec<Linedef> {
-        let linedefs = Vec::new();
+        let mut linedefs = Vec::new();
         let linedef_size_bytes = 14;
         let num_lindefs = lump.lump().data().len() / linedef_size_bytes;
 
@@ -46,11 +50,21 @@ impl Linedef {
 
             let vertex_index_1 = read_cursor.read_u16::<LittleEndian>().unwrap();
             let vertex_index_2 = read_cursor.read_u16::<LittleEndian>().unwrap();
-            let linedef_flags = LinedefFlags::from_bits(read_cursor.read_u16::<LittleEndian>().unwrap());
+            let linedef_flags = LinedefFlags::from_bits(read_cursor.read_u16::<LittleEndian>().unwrap()).unwrap();
             let special = read_cursor.read_u16::<LittleEndian>().unwrap();
             let sector_tag = read_cursor.read_u16::<LittleEndian>().unwrap();
             let sidedef_index_front = read_cursor.read_i16::<LittleEndian>().unwrap();
             let sidedef_index_back = read_cursor.read_i16::<LittleEndian>().unwrap();
+
+            linedefs.push(Linedef {
+                vertex_index_1, 
+                vertex_index_2, 
+                linedef_flags,
+                special,
+                sector_tag, 
+                sidedef_index_front,
+                sidedef_index_back
+            });
         }
 
         linedefs
