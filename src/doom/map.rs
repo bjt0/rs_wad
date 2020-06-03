@@ -130,10 +130,10 @@ impl<'a> DoomMap<'a> {
     pub fn get_map(mut map_marker: Entry<'a>) -> Self {
         let name = map_marker.lump().name();
 
-        let things_lump   = map_marker.next().unwrap();
-        let linedefs_lump = map_marker.next().unwrap();
-        let sidedefs_lump = map_marker.next().unwrap();
-        let vertexes_lump = map_marker.next().unwrap();
+        let things_entry   = map_marker.next().unwrap();
+        let linedefs_entry = map_marker.next().unwrap();
+        let sidedefs_entry = map_marker.next().unwrap();
+        let vertexes_entry = map_marker.next().unwrap();
         
         // these are created by a nodebuilder
         let segs_lump     = map_marker.next().unwrap();
@@ -149,10 +149,10 @@ impl<'a> DoomMap<'a> {
             has_reject_lump = true;
         } 
 
-        let things = Thing::from_things_lump(things_lump);
-        let linedefs = Linedef::from_linedefs_lump(linedefs_lump);
-        let sidedefs = Sidedef::from_lump(sidedefs_lump.lump());
-        let vertexes = Vertex::from_lump(vertexes_lump.lump());
+        let things   = Thing::from_lump(things_entry.lump());
+        let linedefs = Linedef::from_lump(linedefs_entry.lump());
+        let sidedefs = Sidedef::from_lump(sidedefs_entry.lump());
+        let vertexes = Vertex::from_lump(vertexes_entry.lump());
 
         DoomMap { wad: map_marker.owner(), name, things, linedefs, sidedefs, vertexes }
     }

@@ -1,4 +1,4 @@
-use wad::Lump;
+use wad::{Lump, FromLump};
 use doom::{DoomPoint, byteorder::ReadBytesExt, byteorder::LittleEndian};
 use std::io::Cursor;
 
@@ -14,8 +14,10 @@ impl Vertex {
     pub fn y(&self) -> i16 {
         self.location.y()
     }
+}
 
-    pub fn from_lump(lump: &Lump) -> Vec<Vertex> {
+impl FromLump<Vec<Vertex>> for Vertex {
+    fn from_lump(lump: &Lump) -> Vec<Vertex> {
         let mut vertexes = Vec::new();
         let vertex_size_bytes = 4;
         let num_vertexes = lump.data().len() / vertex_size_bytes;

@@ -348,3 +348,7 @@ impl<'a> Iterator for Entry<'a> {
         })
     }
 }
+
+pub trait FromLump<T> {
+    fn from_lump(lump: &Lump) -> T;
+}
