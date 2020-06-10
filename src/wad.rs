@@ -96,8 +96,7 @@ impl Wad {
         Entry::by_name(self, name)
     }
 
-    pub fn from_path(path: &str) -> Wad {
-        let path = Path::new(path);
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Wad {
         let mut wad_file = File::open(path).unwrap_or_else(|e| panic!("Unable to open WAD {}", e));
 
         Wad::from_file(&mut wad_file)
