@@ -96,8 +96,7 @@ impl Wad {
         Entry::by_name(self, name)
     }
 
-    pub fn from_path(path: &str) -> Wad {
-        let path = Path::new(path);
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Wad {
         let mut wad_file = File::open(path).unwrap_or_else(|e| panic!("Unable to open WAD {}", e));
 
         Wad::from_file(&mut wad_file)
@@ -176,7 +175,7 @@ impl Wad {
                 };
 
                 // compression type
-                let compression_type_raw: u8 = u8::from(entry_raw[13]);
+                let compression_type_raw = entry_raw[13];
                 let compression_type: CompressionType = match compression_type_raw {
                     _ => CompressionType::None,
                 };
@@ -227,7 +226,7 @@ impl Wad {
                 )
             });
 
-            let is_marker = raw_data.len() == 0;
+            let is_marker = raw_data.is_empty();
 
             lumps.push(Lump {
                 name: wadlump.name.clone(),
@@ -275,11 +274,11 @@ impl LumpData {
     }
 
     pub fn data_type(&self) -> LumpDataType {
-        self.data_type.clone()
+        self.data_type
     }
 
     pub fn compression_type(&self) -> CompressionType {
-        self.compression.clone()
+        self.compression
     }
 }
 
@@ -313,18 +312,12 @@ impl<'a> Entry<'a> {
     }
 
     pub fn by_name(wad: &'a Wad, name: &str) -> Option<Entry<'a>> {
-        let lump_ref = wad.lumps.iter().find(|lump| lump.name() == name);
+        let lump = wad.lumps.iter().find(|lump| lump.name() == name)?;
 
-        if lump_ref.is_none() {
-            return None;
-        }
-
-        let result = Entry {
+        Some(Entry{
             wad,
-            lump: lump_ref.unwrap(),
-        };
-
-        Some(result)
+            lump,
+        })
     }
 }
 
