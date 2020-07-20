@@ -111,9 +111,9 @@ impl Wad {
         struct WadLump {
             name: String,
             offset: usize,
-            index: usize,
+            _index: usize,
             wad_size: usize,
-            mem_size: usize,
+            _mem_size: usize,
             data_type: LumpDataType,
             compression: CompressionType,
         }
@@ -143,9 +143,9 @@ impl Wad {
                 wadlumps.push(WadLump {
                     name: trimmed_lump_name_str,
                     offset: dir_offset,
-                    index,
+                    _index: index,
                     wad_size: lump_size,
-                    mem_size: lump_size,
+                    _mem_size: lump_size,
                     data_type: LumpDataType::Doom,
                     compression: CompressionType::None,
                 });
@@ -196,9 +196,9 @@ impl Wad {
                 wadlumps.push(WadLump {
                     name: lump_name,
                     offset: dir_offset,
-                    index,
+                    _index: index,
                     wad_size,
-                    mem_size,
+                    _mem_size: mem_size,
                     data_type: lump_type,
                     compression: compression_type,
                 });

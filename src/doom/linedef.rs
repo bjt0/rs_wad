@@ -43,6 +43,10 @@ impl Linedef {
     pub fn special(&self) -> &LinedefSpecial {
         &self.special
     }
+
+    pub fn tag(&self) -> u16 {
+        self.sector_tag
+    }
 }
 
 impl FromLump<Vec<Linedef>> for Linedef {
