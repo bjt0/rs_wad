@@ -1,5 +1,9 @@
 use wad::*;
-use doom::{byteorder::ReadBytesExt, byteorder::LittleEndian};
+use doom::{
+    byteorder::ReadBytesExt, 
+    byteorder::LittleEndian,
+    specials::*
+};
 use std::io::Cursor;
 use bitflags::*;
 
@@ -21,7 +25,7 @@ pub struct Linedef {
     vertex_index_1: u16,
     vertex_index_2: u16,
     linedef_flags: LinedefFlags,
-    special: u16, 
+    special: LinedefSpecial, 
     sector_tag: u16, 
 
     // doom.exe uses signed shorts for these indices
@@ -34,6 +38,10 @@ pub struct Linedef {
 impl Linedef {
     pub fn flags(&self) -> LinedefFlags {
         self.linedef_flags.clone()
+    }
+
+    pub fn special(&self) -> &LinedefSpecial {
+        &self.special
     }
 }
 
@@ -52,8 +60,10 @@ impl FromLump<Vec<Linedef>> for Linedef {
 
             let vertex_index_1 = read_cursor.read_u16::<LittleEndian>().unwrap();
             let vertex_index_2 = read_cursor.read_u16::<LittleEndian>().unwrap();
+
             let linedef_flags = LinedefFlags::from_bits(read_cursor.read_u16::<LittleEndian>().unwrap()).unwrap();
-            let special = read_cursor.read_u16::<LittleEndian>().unwrap();
+            let special = LinedefSpecial::from_type_number(read_cursor.read_u16::<LittleEndian>().unwrap());
+
             let sector_tag = read_cursor.read_u16::<LittleEndian>().unwrap();
             let sidedef_index_front = read_cursor.read_i16::<LittleEndian>().unwrap();
             let sidedef_index_back = read_cursor.read_i16::<LittleEndian>().unwrap();

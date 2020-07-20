@@ -4,6 +4,7 @@ pub mod map;
 pub mod thing;
 pub mod types;
 pub mod linedef;
+pub mod specials;
 pub mod sidedef;
 pub mod vertex;
 
@@ -142,6 +143,25 @@ mod tests {
             for thing in map.things() {
                 let unknown_thing = match thing.thing_type() {
                     types::ThingType::Unknown(_) => true,
+                    _ => false
+                };
+                
+                assert_eq!(unknown_thing, false);
+            }
+        }
+    }
+
+    #[test]
+    fn verify_all_linedef_specials_loaded() {
+        let w: Wad = Wad::from_path("./GOETIA1.wad");
+        let maplist = map::DoomMap::get_maps(&w);
+        
+        assert!(maplist.len() == 9); // there should be 9 maps in GOETIA1.wad 
+
+        for map in maplist {
+            for linedef in map.linedefs() {
+                let unknown_thing = match linedef.special() {
+                    specials::LinedefSpecial::Unknown(_) => true,
                     _ => false
                 };
                 
