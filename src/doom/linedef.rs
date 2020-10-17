@@ -2,7 +2,7 @@ use wad::*;
 use doom::{
     byteorder::ReadBytesExt, 
     byteorder::LittleEndian,
-    specials::*
+    linedef_special::*
 };
 use std::io::Cursor;
 use bitflags::*;
@@ -24,6 +24,7 @@ bitflags! {
 pub struct Linedef {
     vertex_index_1: u16,
     vertex_index_2: u16,
+    
     linedef_flags: LinedefFlags,
     special: LinedefSpecial, 
     sector_tag: u16, 

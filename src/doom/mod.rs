@@ -4,7 +4,7 @@ pub mod map;
 pub mod thing;
 pub mod types;
 pub mod linedef;
-pub mod specials;
+pub mod linedef_special;
 pub mod sidedef;
 pub mod vertex;
 
@@ -61,6 +61,7 @@ impl DoomDirection {
 mod tests {
     use wad::*;
     use doom::*;
+    use self::linedef_special::*;
 
     #[test]
     fn verify_valid_doom_map() {
@@ -161,7 +162,7 @@ mod tests {
         for map in maplist {
             for linedef in map.linedefs() {
                 let unknown_thing = match linedef.special() {
-                    specials::LinedefSpecial::Unknown(_) => true,
+                    LinedefSpecial::Unknown(_) => true,
                     _ => false
                 };
                 

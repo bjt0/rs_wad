@@ -96,6 +96,10 @@ pub struct DoomMap<'a> {
 }
 
 impl<'a> DoomMap<'a> {
+    pub fn wad(&self) -> &Wad {
+        self.wad
+    }
+
     pub fn name(&self) -> String {
         self.name.clone()
     }
@@ -106,6 +110,14 @@ impl<'a> DoomMap<'a> {
 
     pub fn linedefs(&self) -> &Vec<Linedef> {
         &self.linedefs
+    }
+
+    pub fn sidedefs(&self) -> &Vec<Sidedef> {
+        &self.sidedefs
+    }
+
+    pub fn vertexes(&self) -> &Vec<Vertex> {
+        &self.vertexes
     }
 
     pub fn get_maps(wad: &'a Wad) -> Vec<DoomMap> {
